@@ -8,4 +8,6 @@ app.post('/api/v1/tasks', TasksController.post );
 app.put('/api/v1/tasks/:id', TasksController.update );
 app.delete('/api/v1/tasks/:id', TasksController.destroy );
 
+app.get('/api/v1/tasks/:id/users', TasksController.indexTasks);
+
 module.exports = app;

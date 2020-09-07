@@ -119,6 +119,40 @@ class TasksController {
       });
     }
   }
+
+  static async indexTasks(req, res) {
+    let id = req.params.id;
+
+    try {
+      let data = await db.query(
+        `SELECT users.id, users.name, users.img, users.email
+        FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id
+        INNER JOIN users ON user_tasks.user_id=users.id
+        WHERE tasks.id=?;`,
+        [id]
+      );
+
+      if( data.length < 1 ) {
+        return res.status(404).json({
+          ok: false,
+          err: {
+            message: "La tarea no tiene usuarios"
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
+  }
 }
 
 module.exports = { TasksController };

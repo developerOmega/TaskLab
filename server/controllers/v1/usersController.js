@@ -141,6 +141,41 @@ class UsersController {
 
     }
   }
+
+  static async indexProjects(req, res) {
+    let id = req.params.id;
+
+    try {
+      let data = await db.query(
+        `SELECT projects.id, projects.name, projects.description, projects.status, projects.user_id, projects.updated_at, projects.created_at
+        FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
+        INNER JOIN users ON user_projects.user_id=users.id 
+        WHERE users.id=?;`,
+        [id]
+      );
+
+      if(data.length < 1) {
+        return res.status(404).json({
+          ok: false,
+          err: {
+            message: "El ususario no tiene proyectos"
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
+
+  }
 }
 
 module.exports = { UsersController };
