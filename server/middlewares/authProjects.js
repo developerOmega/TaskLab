@@ -1,0 +1,59 @@
+const component = require('../middlewares/middlewareComp');
+const { db } = require('../../db/db');
+
+const authProject = async (req, res, next) => {
+  let projectId = req.params.id;
+  
+  component.trycatch(res, async () => {
+
+    let users = await db.query(
+      `SELECT users.id, users.email, user_projects.admin
+      FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
+      INNER JOIN users ON user_projects.user_id=users.id
+      WHERE projects.id=?`, [projectId]
+    );
+    let userFilter = users.filter( user => user.email === req.user.email )[0];
+  
+    if( !userFilter ) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "No tienes acceso a este proyecto"
+        }
+      });
+    }
+  
+    next();
+
+  });
+
+}
+
+const authProjectAdmin = async (req, res, next) => {
+  let projectId = req.params.id;
+  
+  component.trycatch( res, async () => {
+
+    let user = await db.query(
+      `SELECT users.id, user_projects.admin
+      FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
+      INNER JOIN users ON user_projects.user_id=users.id
+      WHERE projects.id=? AND users.id=?`, [projectId, req.user.id]
+    );
+  
+    if(user.length < 1 || user[0].admin == false) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "No tienes acceso a esta accion"
+        }
+      });
+    }
+  
+    next();
+
+  } );
+  
+}
+
+module.exports = { authProjectAdmin, authProject };

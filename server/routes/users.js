@@ -1,6 +1,6 @@
 const { UsersController } = require('../controllers/v1/usersController');
 const { authUser } = require('../middlewares/authJwt');
-const { authUserReq } = require('../middlewares/authElements');
+const { authUserReq } = require('../middlewares/authUser');
 const express = require('express');
 const app = express(); 
 

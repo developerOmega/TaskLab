@@ -1,6 +1,6 @@
 const { ProjectsController } = require('../controllers/v1/projectsController');
 const { authUser } = require('../middlewares/authJwt');
-const { authProject, authProjectAdmin } = require('../middlewares/authElements');
+const { authProject, authProjectAdmin } = require('../middlewares/authProjects');
 const express = require('express');
 const app = express();
 

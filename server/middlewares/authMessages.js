@@ -1,0 +1,49 @@
+const component = require('../middlewares/middlewareComp');
+const { db } = require('../../db/db');
+
+const authMessage = async (req, res, next) => {
+  let body = req.body;
+
+  component.trycatch(res, async () => {
+
+    let userProject = await db.query(
+      `SELECT * FROM user_projects WHERE user_id=? AND project_id=?`, 
+      [req.user.id, body.project_id]
+    );
+  
+    if(userProject.length < 1) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "No tienes acceso a este proyecto"
+        }
+      });
+    }
+  
+    next();
+    
+  })
+
+}
+
+const authMessageById = async (req, res, next) => {
+  let id = req.params.id;
+
+  component.trycatch( res, async () => {
+    let message = await db.query(`SELECT * FROM messages WHERE id=? AND user_id=?`, [id, req.user.id]);
+
+    if(message.length < 1) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "No tienes acceso a este proyecto"
+        }
+      });
+    }
+
+    next();
+  });
+
+}
+
+module.exports = { authMessage, authMessageById };
