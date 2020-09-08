@@ -26,6 +26,7 @@ app.use(require('./routes/events.js'));
 app.use(require('./routes/tasks.js'));
 app.use(require('./routes/user_projects.js'));
 app.use(require('./routes/user_tasks.js'));
+app.use(require('./routes/userAuth.js'));
 
 app.listen(port, () => {
   console.log(`Conectado al puerto ${port}`);
