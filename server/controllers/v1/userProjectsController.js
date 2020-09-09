@@ -27,6 +27,29 @@ class UserProductsController {
       });
     }
   }
+
+  static async destroy (req, res) {
+    let userId = req.params.user_id;
+    let projectId = req.params.project_id;
+
+    try {
+      let data = await db.query(
+        `DELETE FROM user_projects WHERE user_id=? AND project_id=?`,
+        [userId, projectId]
+      );
+
+      return res.status(200).json({
+        ok: true,
+        message: "La relacion se elimino con exito"
+      });
+
+    } catch (err) {
+      return res.status(400).json({
+        ok: true,
+        err
+      });
+    }
+  }
 }
 
 module.exports = { UserProductsController };

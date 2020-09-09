@@ -27,6 +27,29 @@ class UserTasksController {
       });
     }
   }
+
+  static async destroy (req, res) {
+    let userId = req.params.user_id;
+    let taskId = req.params.task_id;
+
+    try {
+      let data = await db.query(
+        `DELETE FROM user_tasks WHERE user_id=? AND task_id=?`,
+        [userId, taskId]
+      );
+
+      return res.status(200).json({
+        ok: true,
+        message: "La relacion se elimino con exito"
+      });
+
+    } catch (err) {
+      return res.status(400).json({
+        ok: true,
+        err
+      });
+    }
+  }
 }
 
 module.exports = { UserTasksController };
