@@ -13,7 +13,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 // ====================================
 // Entorno de Dropbox
 // ====================================
-const dropboxEnv = 'Ho hay :c';
+const dropboxEnv = nodeEnv === 'development' ?  'Dw2AgsFcyFYAAAAAAAAAAZDWXWtrAdyGtmc6M2vsv7hRGpeLPrAp1fk1KKTEavYm' : process.env.DROPBOX;
 
 // ====================================
 // JsonWebToken

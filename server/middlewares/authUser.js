@@ -1,10 +1,9 @@
 const { db } = require('../../db/db');
 
-const authUserReq = async (req, res, next) => {
+const authUserById = async (req, res, next) => {
   let userId = parseInt(req.params.id);
 
   if( req.user.id !== userId ) {
-    console.log("Por que?");
 
     return res.status(403).json({
       ok: false,
@@ -17,5 +16,32 @@ const authUserReq = async (req, res, next) => {
   next();
 }
 
+const validateUser = async (req, res, next) => {
+  let id = req.params.id;
 
-module.exports = { authUserReq };
+  try {
+    let user = await db.query( `SELECT * FROM users WHERE id = ?`, [id] );
+
+    if(!user[0]) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "El registro no existe"
+        }
+      });
+    }
+
+    next();
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    })
+  }
+}
+
+module.exports = { authUserById, validateUser };

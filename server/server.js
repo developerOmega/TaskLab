@@ -19,14 +19,8 @@ app.use(cors());
 const publicPath = path.resolve(__dirname, '../public');
 app.use(express.static(publicPath));
 
-app.use(require('./routes/users.js'));
-app.use(require('./routes/projects.js'));
-app.use(require('./routes/messages.js'));
-app.use(require('./routes/events.js'));
-app.use(require('./routes/tasks.js'));
-app.use(require('./routes/user_projects.js'));
-app.use(require('./routes/user_tasks.js'));
-app.use(require('./routes/userAuth.js'));
+// Project routes
+app.use(require('./routes/index.js'));
 
 app.listen(port, () => {
   console.log(`Conectado al puerto ${port}`);

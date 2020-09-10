@@ -1,0 +1,29 @@
+const validateFiles = (req, res, next) => {
+    if(!req.files){
+        return res.status(400).json({
+            ok: false,
+            err: {
+                message: "No se ha seleccionado ningun archivo"
+            }
+        });
+    }
+
+    let img = req.files.img.name;
+    let cutName = img.split('.');
+    let extension = cutName[cutName.length - 1];
+
+    let validExtension = ['png', 'jpg', 'gif', 'jpeg', 'JPEG'];
+
+    if(validExtension.indexOf(extension) < 0){
+        return res.status(400).json({
+            ok: false,
+            err: {
+                message: `Las extenciones permitidas son: ${ validExtension.join(', ') }.`
+            }
+        })    
+    }
+
+    next();
+}
+
+module.exports = { validateFiles }
