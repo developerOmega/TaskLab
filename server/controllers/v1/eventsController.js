@@ -1,4 +1,4 @@
-const { db } = require("../../../db/db");
+const Event = require('../../queries/Event');
 
 class EventsController {
   
@@ -7,11 +7,7 @@ class EventsController {
     let end = req.query.end;
 
     try {
-      
-      let data = init && end ? 
-        await db.query(`SELECT * FROM events WHERE id >= ? AND id <= ?`, [init, end]) :
-        await db.query(`SELECT * FROM events`);
-
+      let data = await Event.paginate(init, end); 
 
       if( data.length < 1 ){
         return res.status(404).json({
@@ -39,17 +35,20 @@ class EventsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
+      let data = await Event.byId(id);
 
-      return res.staus(200).json({
+      return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       })
 
     } catch (err) {
       return res.status(500).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       });
     }
   }
@@ -58,12 +57,7 @@ class EventsController {
     let body = req.body;
 
     try {
-      let query = await db.query(
-        `INSERT INTO events (name, description, time_init, time_end, project_id) VALUES (?,?,?,?, ?)`,
-        [body.name, body.description, body.time_init, body.time_end, body.project_id]
-      )
-
-      let data = await db.query(`SELECT * FROM events WHERE id = ?`, [query.insertId]);
+      let data = await Event.create(body);
 
       return res.status(200).json({
         ok: true,
@@ -85,12 +79,12 @@ class EventsController {
     let body = req.body;
 
     try {
-      let query = await db.query(`UPDATE events SET ? WHERE ?`, [body, id]);
-      let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
+      let event = await Event.byId(id);
+      let data = await event.update(body);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -108,7 +102,8 @@ class EventsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(`DELETE FROM events WHERE id = ?`, [id]);
+      let data = await Event.byId(id);
+      await data.delete();
       
       return res.status(200).json({
         ok: true,

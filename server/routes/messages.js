@@ -8,6 +8,6 @@ const app = express();
 // app.get('/api/v1/messages/:id', MessagesController.show );
 app.post('/api/v1/messages', [authUser, authMessage], MessagesController.post );
 app.put('/api/v1/messages/:id', [authUser, validateMessage, authMessageById], MessagesController.update );
-app.delete('/api/v1/messages/:id', [authUser, validateMessage, authMessageById], MessagesController.delete );
+app.delete('/api/v1/messages/:id', [authUser, validateMessage, authMessageById], MessagesController.destroy );
 
 module.exports = app;

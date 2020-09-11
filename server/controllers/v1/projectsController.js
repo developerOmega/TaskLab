@@ -1,4 +1,5 @@
-const { db } = require("../../../db/db");
+const Project = require("../../queries/Project");
+const UserProject = require('../../queries/UserProject');
 
 class ProjectsController {
 
@@ -7,11 +8,9 @@ class ProjectsController {
     let end = req.query.end;
 
     try {
-      
-      let data = init && end ?
-        await db.query(`SELECT * FROM projects WHERE id >= ? AND id <= ?`, [init, end]) :
-        await db.query(`SELECT * FROM projects`);
 
+      let data = await Project.paginate(init, end);
+      
       return res.status(200).json({
         ok: true,
         data
@@ -31,11 +30,11 @@ class ProjectsController {
 
     try {
 
-      let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
+      let data = await Project.byId(id);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data: data
       });
 
     } catch (err) {
@@ -50,22 +49,23 @@ class ProjectsController {
     let body = req.body;
 
     try {
-      let query = await db.query(
-        `INSERT INTO projects (name, description, status, user_id) VALUES (?,?,?,?)`,
-        [body.name, body.description, body.status, body.user_id]
-      );
-      
-      let queryUserProject = await db.query(
-        `INSERT INTO user_projects (user_id, project_id, admin) VALUES (?,?,?)`,
-        [ req.user.id, query.insertId, 1 ]
-      )
-      
-      let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [query.insertId]);
-      
+
+      let data = await Project.create({
+        name: body.name,
+        description: body.description,
+        status: body.status,
+        user_id: req.user.id
+      });
+
+      await UserProject.create({
+        user_id: req.user.id,
+        project_id: data.id,
+        admin: 1
+      });
       
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -81,10 +81,12 @@ class ProjectsController {
   static async update (req, res) {
     let id =  req.params.id;
     let body = req.body;
+    delete body.user_id;
 
     try {
-      let query = await db.query(`UPDATE projects SET ? WHERE id =  ?`, [body, id]);
-      let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
+
+      let project = await Project.byId(id);
+      let data = await project.update( body );
       
       return res.status(200).json({
         ok: true,
@@ -95,7 +97,10 @@ class ProjectsController {
       
       return res.status(400).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       })
 
     }
@@ -105,7 +110,9 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(`DELETE FROM projects WHERE id = ?`, [id]);
+
+      let project = await Project.byId(id);
+      await project.delete();
 
       return res.status(200).json({
         ok: true,
@@ -124,11 +131,9 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT users.id, users.name, users.email, users.img, users.verify, users.active, users.updated_at, users.created_at
-        FROM projects INNER JOIN users ON projects.user_id=users.id
-        WHERE projects.id= ?`, [id]
-      );
+
+      let project = await Project.byId(id);
+      let data = await project.user();
 
       if( data.length < 1 ){
         return res.status(400).json({
@@ -141,7 +146,7 @@ class ProjectsController {
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -157,12 +162,9 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT users.id, users.name, users.email, users.img, users.verify, users.active, user_projects.admin, users.updated_at, users.created_at
-        FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
-        INNER JOIN users ON user_projects.user_id=users.id
-        WHERE projects.id = ?`, [id]
-      );
+      
+      let project = await Project.byId(id);
+      let data = await project.users();
 
       if( data.length < 1 ){
         return res.status(400).json({
@@ -190,12 +192,9 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT messages.id, messages.content, users.name, users.email, messages.updated_at, messages.created_at 
-        FROM messages INNER JOIN users ON messages.user_id=users.id
-        INNER JOIN projects ON messages.project_id=projects.id
-        WHERE projects.id = ?`, [id]
-      )
+
+      let project = await Project.byId(id);
+      let data = await project.messages();
 
       if(data.length < 1) {
         return res.status(404).json({
@@ -223,11 +222,9 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT events.id, events.name, events.description, events.time_init, events.time_end, events.updated_at, events.created_at
-        FROM events INNER JOIN projects ON events.project_id=projects.id
-        WHERE projects.id=?`, [id]
-      );
+
+      let project = await Project.byId(id);
+      let data = await project.events();
 
       if(data.length < 1) {
         return res.status(400).json({
@@ -255,7 +252,8 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query( `SELECT * FROM tasks WHERE project_id=?`, [id] );
+      let project = await Project.byId(id);
+      let data = await project.tasks();
 
       if(data.length < 1) {
         return res.status(400).json({

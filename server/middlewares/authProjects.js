@@ -1,19 +1,14 @@
-const { db } = require('../../db/db');
+const Project = require('../queries/Project');
+const UserProject = require('../queries/UserProject');
 
 const authProject = async (req, res, next) => {
   let projectId = req.params.id;
   
   try {
     
-    let users = await db.query(
-      `SELECT users.id, users.email, user_projects.admin
-      FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
-      INNER JOIN users ON user_projects.user_id=users.id
-      WHERE projects.id=?`, [projectId]
-    );
-    let userFilter = users.filter( user => user.email === req.user.email )[0];
+    let userProject = await UserProject.byId(req.user.id, projectId);
   
-    if( !userFilter ) {
+    if( !userProject ) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -40,15 +35,10 @@ const authProjectAdmin = async (req, res, next) => {
   let projectId = req.params.id;
   
   try {
-    
-    let user = await db.query(
-      `SELECT users.id, user_projects.admin
-      FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
-      INNER JOIN users ON user_projects.user_id=users.id
-      WHERE projects.id=? AND users.id=?`, [projectId, req.user.id]
-    );
-  
-    if(user.length < 1 || user[0].admin == false) {
+
+    let userProject = await UserProject.byIdAdmin(req.user.id, projectId);
+
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -76,9 +66,9 @@ const validateProject = async (req, res, next) => {
 
   try {
     
-    let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
+    let data = await Project.byId(id);
 
-    if ( !data[0] ) {
+    if ( !data ) {
       return res.status(404).json({
         ok: false,
         err: {
@@ -105,9 +95,8 @@ const validateProjectsPag = async (req, res, next) => {
   let end = req.query.end;
 
   try {
-    let data = init && end ?
-    await db.query(`SELECT * FROM projects WHERE id >= ? AND id <= ?`, [init, end]) :
-    await db.query(`SELECT * FROM projects`);
+
+    let data = await Project.paginate(init, end);
 
     if(data.length < 1) {
       return res.status(404).json({
