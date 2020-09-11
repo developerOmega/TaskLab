@@ -1,6 +1,6 @@
 const { db } = require('../../db/db');
 
-const authUserAdmin = async (req, res, next) => {
+const authUserProjectAdmin = async (req, res, next) => {
   let body = req.body;
 
   try {
@@ -33,7 +33,7 @@ const authUserAdmin = async (req, res, next) => {
   }
 }
 
-const authUserById = async (req, res, next) => {
+const authUserProjectById = async (req, res, next) => {
   let userId = parseInt(req.params.user_id);
   let projectId = parseInt(req.params.project_id);
 
@@ -65,4 +65,36 @@ const authUserById = async (req, res, next) => {
   }
 }
 
-module.exports = { authUserAdmin, authUserById };
+const validateUserProject = async (req, res, next) => {
+  let userId = req.params.user_id;
+  let projectId = req.params.project_id;
+
+  try {
+    let data = await db.query(
+      `SELECT * FROM user_projects WHERE user_id=? AND project_id=?`, 
+      [userId, projectId]
+    );
+
+    if(!data[0]) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "La relacion no existe"
+        }
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
+}
+
+module.exports = { authUserProjectAdmin, authUserProjectById, validateUserProject };

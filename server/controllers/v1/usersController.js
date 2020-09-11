@@ -12,16 +12,7 @@ class UsersController {
       let data = init && end ? 
         await db.query(`SELECT * FROM users WHERE id >= ? AND id <= ?`, [init, end]) :
         await db.query(`SELECT * FROM users`);
-
-      if(data.length < 1) {
-        res.status(404).json({
-          ok: false,
-          err: {
-            message: "No existe ningun usuario"
-          }
-        });
-      }
-
+        
       return res.status(200).json({
         ok: true,
         data: data
@@ -46,15 +37,6 @@ class UsersController {
         `SELECT * FROM users WHERE id = ?`,
         [id]
       );
-
-      if ( !data[0] ) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "El usuario no existe"
-          }
-        })
-      }
 
       return res.status(200).json({
         ok: true,

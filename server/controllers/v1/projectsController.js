@@ -12,15 +12,6 @@ class ProjectsController {
         await db.query(`SELECT * FROM projects WHERE id >= ? AND id <= ?`, [init, end]) :
         await db.query(`SELECT * FROM projects`);
 
-      if(data.length < 1) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No existe ningun proyecto"
-          }
-        });
-      }
-      
       return res.status(200).json({
         ok: true,
         data
@@ -39,16 +30,8 @@ class ProjectsController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
 
-      if ( !data[0] ) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "El proyecto no existe"
-          }
-        })
-      }
+      let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
 
       return res.status(200).json({
         ok: true,
@@ -71,9 +54,15 @@ class ProjectsController {
         `INSERT INTO projects (name, description, status, user_id) VALUES (?,?,?,?)`,
         [body.name, body.description, body.status, body.user_id]
       );
-
+      
+      let queryUserProject = await db.query(
+        `INSERT INTO user_projects (user_id, project_id, admin) VALUES (?,?,?)`,
+        [ req.user.id, query.insertId, 1 ]
+      )
+      
       let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [query.insertId]);
-
+      
+      
       return res.status(200).json({
         ok: true,
         data: data[0]

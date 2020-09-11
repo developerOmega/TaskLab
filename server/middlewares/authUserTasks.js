@@ -78,6 +78,34 @@ const authUserTaskAdminById = async (req, res, next) => {
   }
 }
 
+const validateUserTask = async (req, res, next) => {
+  let userId = req.params.user_id;
+  let taskId = req.params.task_id;
 
+  try {
+    let data = await db.query(
+      `SELECT * FROM user_tasks WHERE user_id=? AND task_id=?`,
+      [userId, taskId]
+    );
 
-module.exports = { authUserTaskAdmin, authUserTaskAdminById };
+    if(!data[0]) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "La relacion no existe"
+        }
+      });
+    }
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+}
+
+module.exports = { authUserTaskAdmin, authUserTaskAdminById, validateUserTask };

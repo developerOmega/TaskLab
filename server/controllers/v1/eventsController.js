@@ -41,19 +41,10 @@ class EventsController {
     try {
       let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
 
-      if ( !data[0] ) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encotro el evento"
-          },
-        });
-      }
-
-      return res.status(200).json({
+      return res.staus(200).json({
         ok: true,
         data: data[0]
-      });
+      })
 
     } catch (err) {
       return res.status(500).json({
@@ -97,13 +88,19 @@ class EventsController {
       let query = await db.query(`UPDATE events SET ? WHERE ?`, [body, id]);
       let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
 
-      return res.status(400).json({
+      return res.status(200).json({
         ok: true,
         data: data[0]
       });
 
     } catch (err) {
-      
+      return res.status(400).json({
+        ok: false,
+        err: {
+          name: err.name,
+          message: err.message
+        }
+      });
     }
   }
   

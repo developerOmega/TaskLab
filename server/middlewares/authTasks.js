@@ -4,8 +4,6 @@ const authTaskById = async (req, res, next) => {
   let taskId = req.params.id;
   
   try {
-    
-    
 
     let task = await db.query(
       `SELECT * FROM tasks WHERE id=?`, [taskId]
@@ -105,5 +103,32 @@ const authTaksAdminById = async (req, res, next) => {
 
 }
 
+const validateTask = async (req, res, next) => {
+  let id = req.params.id;
 
-module.exports = { authTaksAdmin, authTaksAdminById, authTaskById };
+  try {
+    let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [id]);
+
+    if ( !data[0] ) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "No se encotro el mensaje"
+        }
+      })
+    }
+    next();
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+}
+
+
+module.exports = { authTaksAdmin, authTaksAdminById, authTaskById, validateTask };

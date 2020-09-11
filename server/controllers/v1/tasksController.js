@@ -36,15 +36,6 @@ class TasksController {
     try {
       let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [id]);
 
-      if ( !data[0] ) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encotro el mensaje"
-          }
-        })
-      }
-
       return res.status(200).json({
         ok: true, 
         data: data[0]
@@ -120,7 +111,7 @@ class TasksController {
     }
   }
 
-  static async indexTasks(req, res) {
+  static async indexUsers(req, res) {
     let id = req.params.id;
 
     try {

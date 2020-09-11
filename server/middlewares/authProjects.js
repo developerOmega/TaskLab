@@ -71,4 +71,65 @@ const authProjectAdmin = async (req, res, next) => {
     
 }
 
-module.exports = { authProjectAdmin, authProject };
+const validateProject = async (req, res, next) => {
+  let id = req.params.id;
+
+  try {
+    
+    let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [id]);
+
+    if ( !data[0] ) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "No se encotro el proyecto"
+        },
+      });
+    }
+
+    next();
+    
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    })
+  }
+}
+
+const validateProjectsPag = async (req, res, next) => {
+  let init = req.query.init;
+  let end = req.query.end;
+
+  try {
+    let data = init && end ?
+    await db.query(`SELECT * FROM projects WHERE id >= ? AND id <= ?`, [init, end]) :
+    await db.query(`SELECT * FROM projects`);
+
+    if(data.length < 1) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "No existe ningun proyecto"
+        }
+      });
+    }
+
+    next();
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: true,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
+}
+
+module.exports = { authProjectAdmin, authProject, validateProject, validateProjectsPag };

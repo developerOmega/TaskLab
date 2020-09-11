@@ -63,4 +63,31 @@ const authMessageById = async (req, res, next) => {
 
 }
 
-module.exports = { authMessage, authMessageById };
+const validateMessage = async (req, res, next) => {
+  let id = req.params.id;
+
+  try {
+    let data = await db.query(`SELECT * FROM messages WHERE id = ?`, [id]);
+
+    if ( !data[0] ) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "No se encotro el mensaje"
+        }
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+}
+
+module.exports = { authMessage, authMessageById, validateMessage };

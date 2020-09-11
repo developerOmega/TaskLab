@@ -2,65 +2,6 @@ const { db } = require("../../../db/db");
 
 class MessagesController {
 
-  static async index(req, res) {
-    let init = req.query.init;
-    let end = req.query.end;
-    
-    try {
-      let data = init && end ? 
-        await db.query(`SELECT * FROM messages WHERE id >= ? AND id <= ?`, [init, end]) :
-        await db.query(`SELECT * FROM messages`);
-
-      if(data.length < 1) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encontro ningun mensaje"
-          }
-        });
-      }
-
-      return res.status(200).json({
-        ok: true,
-        data
-      });
-
-    } catch (err) {
-      return res.status(500).json({
-        ok: false,
-        err
-      });
-    }
-  }
-
-  static async show(req, res) {
-    let id = req.params.id;
-
-    try {
-      let data = await db.query(`SELECT * FROM messages WHERE id = ?`, [id]);
-
-      if ( !data[0] ) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encotro el mensaje"
-          }
-        })
-      }
-
-      return res.status(200).json({
-        ok: true,
-        data: data[0]
-      });
-
-    } catch (err) {
-      return res.status(500).json({
-        ok: false,
-        err
-      });
-    }
-  }
-
   static async post(req, res) {
     let body = req.body;
 

@@ -7,15 +7,6 @@ const authEventById = async (req, res, next) => {
     let event = await db.query(
       `SELECT * FROM events WHERE id=?`, [eventId]
     );
-
-    if( event.length <  1 ) {
-      return res.status(400).json({
-        ok: false,
-        err: {
-          message: "El evento no existe"
-        }
-      });
-    }
   
     let projectsPerUser = await db.query(
       `SELECT * FROM user_projects WHERE user_id = ? AND project_id = ?`,
@@ -26,7 +17,7 @@ const authEventById = async (req, res, next) => {
       return res.status(403).json({
         ok: false,
         err: {
-          message: "No tienes acceso a esta tarea"
+          message: "No tienes acceso a este evento"
         }
       });
     }
@@ -110,5 +101,32 @@ const authEventAdminById = async (req, res, next) => {
 
 }
 
+const validateEvent = async (req, res, next) => {
+  let id = req.params.id;
 
-module.exports = { authEventAdmin, authEventAdminById, authEventById };
+  try {
+    let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
+
+    if ( !data[0] ) {
+      return res.status(404).json({
+        ok: false,
+        err: {
+          message: "No se encotro el evento"
+        },
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+}
+
+
+module.exports = { authEventAdmin, authEventAdminById, authEventById, validateEvent };
