@@ -6,7 +6,7 @@ const app = express();
 
 app.get('/api/v1/users', authUser, UsersController.index);
 app.get('/api/v1/users/:id', authUser, UsersController.show);
-app.post('/api/v1/users/', authUser, UsersController.post);
+app.post('/api/v1/users/', UsersController.post);
 app.put('/api/v1/users/:id', [authUser, authUserById], UsersController.update);
 app.delete('/api/v1/users/:id', [authUser, authUserById], UsersController.destroy);
 

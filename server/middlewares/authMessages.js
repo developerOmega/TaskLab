@@ -1,11 +1,10 @@
-const component = require('../middlewares/middlewareComp');
 const { db } = require('../../db/db');
 
 const authMessage = async (req, res, next) => {
   let body = req.body;
 
-  component.trycatch(res, async () => {
-
+  try {
+    
     let userProject = await db.query(
       `SELECT * FROM user_projects WHERE user_id=? AND project_id=?`, 
       [req.user.id, body.project_id]
@@ -21,17 +20,26 @@ const authMessage = async (req, res, next) => {
     }
   
     next();
-    
-  })
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
 
 }
 
 const authMessageById = async (req, res, next) => {
   let id = req.params.id;
 
-  component.trycatch( res, async () => {
+  try {
+    
     let message = await db.query(`SELECT * FROM messages WHERE id=? AND user_id=?`, [id, req.user.id]);
-
+  
     if(message.length < 1) {
       return res.status(403).json({
         ok: false,
@@ -40,9 +48,18 @@ const authMessageById = async (req, res, next) => {
         }
       });
     }
-
+  
     next();
-  });
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    })
+  }
 
 }
 

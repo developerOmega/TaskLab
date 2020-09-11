@@ -1,11 +1,9 @@
-const component = require('../middlewares/middlewareComp');
 const { db } = require('../../db/db');
 
 const authEventById = async (req, res, next) => {
   let eventId = req.params.id;
-  
-  component.trycatch( res, async () => {
 
+  try {
     let event = await db.query(
       `SELECT * FROM events WHERE id=?`, [eventId]
     );
@@ -33,15 +31,23 @@ const authEventById = async (req, res, next) => {
       });
     }
     next();
-  });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    })
+  }
 
 }
 
 const authEventAdmin = async (req, res, next) => {
   let body = req.body;
 
-  component.trycatch(res, async () => {
-
+  try {
+    
     let projects = await db.query(
       `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`, 
       [req.user.id, body.project_id, 1]
@@ -56,21 +62,31 @@ const authEventAdmin = async (req, res, next) => {
       });
     }
     next();
-  });
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
 }
 
 const authEventAdminById = async (req, res, next) => {
   let eventId = req.params.id;
 
-  component.trycatch(res, async () => {
-
+  try {
+    
     let event = await db.query(`SELECT * FROM events WHERE id=?`, [eventId]);
   
     let projects = await db.query(
       `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`, 
       [req.user.id, event[0].project_id, 1]
     );
-
+  
     if(projects.length < 1) {
       return res.status(403).json({
         ok: false,
@@ -79,10 +95,19 @@ const authEventAdminById = async (req, res, next) => {
         }
       });
     }
-
+  
     next();
 
-  });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
 }
 
 

@@ -1,10 +1,11 @@
-const component = require('../middlewares/middlewareComp');
 const { db } = require('../../db/db');
 
 const authTaskById = async (req, res, next) => {
   let taskId = req.params.id;
   
-  component.trycatch( res, async () => {
+  try {
+    
+    
 
     let task = await db.query(
       `SELECT * FROM tasks WHERE id=?`, [taskId]
@@ -24,15 +25,24 @@ const authTaskById = async (req, res, next) => {
       });
     }
     next();
-  });
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
 
 }
 
 const authTaksAdmin = async (req, res, next) => {
   let body = req.body;
 
-  component.trycatch(res, async () => {
-
+  try {
+    
     let projects = await db.query(
       `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND user_projects.admin=?`, 
       [req.user.id, body.project_id, 1]
@@ -47,14 +57,24 @@ const authTaksAdmin = async (req, res, next) => {
       });
     }
     next();
-  });
+
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
 }
 
 const authTaksAdminById = async (req, res, next) => {
   let taskId = req.params.id;
 
-  component.trycatch(res, async () => {
-
+  try {
+    
     let task = await db.query(`SELECT * FROM tasks WHERE id=?`, [taskId]);
   
     let projects = await db.query(
@@ -70,10 +90,19 @@ const authTaksAdminById = async (req, res, next) => {
         }
       });
     }
-
+  
     next();
 
-  });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+
 }
 
 

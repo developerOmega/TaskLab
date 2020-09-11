@@ -1,11 +1,10 @@
-const component = require('../middlewares/middlewareComp');
 const { db } = require('../../db/db');
 
 const authProject = async (req, res, next) => {
   let projectId = req.params.id;
   
-  component.trycatch(res, async () => {
-
+  try {
+    
     let users = await db.query(
       `SELECT users.id, users.email, user_projects.admin
       FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
@@ -25,15 +24,23 @@ const authProject = async (req, res, next) => {
   
     next();
 
-  });
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
 
 }
 
 const authProjectAdmin = async (req, res, next) => {
   let projectId = req.params.id;
   
-  component.trycatch( res, async () => {
-
+  try {
+    
     let user = await db.query(
       `SELECT users.id, user_projects.admin
       FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
@@ -52,8 +59,16 @@ const authProjectAdmin = async (req, res, next) => {
   
     next();
 
-  } );
-  
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    });
+  }
+    
 }
 
 module.exports = { authProjectAdmin, authProject };
