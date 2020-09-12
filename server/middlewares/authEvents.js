@@ -1,19 +1,14 @@
-const { db } = require('../../db/db');
+const UserProject = require('../queries/UserProject');
+const Event = require('../queries/Event');
 
 const authEventById = async (req, res, next) => {
   let eventId = req.params.id;
 
   try {
-    let event = await db.query(
-      `SELECT * FROM events WHERE id=?`, [eventId]
-    );
+    let event = await Event.byId(eventId);
+    let projectsPerUser = await UserProject.byId(req.user.id, event.project_id);
   
-    let projectsPerUser = await db.query(
-      `SELECT * FROM user_projects WHERE user_id = ? AND project_id = ?`,
-      [req.user.id, event[0].project_id]
-    );
-  
-    if( projectsPerUser.length <  1 ) {
+    if( !projectsPerUser ) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -38,13 +33,9 @@ const authEventAdmin = async (req, res, next) => {
   let body = req.body;
 
   try {
+    let project = await UserProject.byIdAdmin(req.user.id, body.project_id);
     
-    let projects = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`, 
-      [req.user.id, body.project_id, 1]
-    );
-    
-    if(projects.length < 1) {
+    if(!project) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -70,15 +61,11 @@ const authEventAdminById = async (req, res, next) => {
   let eventId = req.params.id;
 
   try {
-    
-    let event = await db.query(`SELECT * FROM events WHERE id=?`, [eventId]);
+
+    let event = await Event.byId(eventId);
+    let userProject = await UserProject.byId(req.user.id, event.project_id);
   
-    let projects = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`, 
-      [req.user.id, event[0].project_id, 1]
-    );
-  
-    if(projects.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -105,9 +92,9 @@ const validateEvent = async (req, res, next) => {
   let id = req.params.id;
 
   try {
-    let data = await db.query(`SELECT * FROM events WHERE id = ?`, [id]);
+    let event = await Event.byId(id);
 
-    if ( !data[0] ) {
+    if (!event) {
       return res.status(404).json({
         ok: false,
         err: {

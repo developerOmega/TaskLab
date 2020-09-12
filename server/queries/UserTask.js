@@ -24,7 +24,7 @@ class UserTask extends Model {
   static async byId (userId, taskId) {
     try {
       let data = await db.query(
-        `SELECT * FROM user_task WHERE user_id=? AND task_id=?`,
+        `SELECT * FROM user_tasks WHERE user_id=? AND task_id=?`,
         [ userId, taskId ]
       );
 

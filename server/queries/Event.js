@@ -47,14 +47,14 @@ class Event extends Model{
     )
 
     let data = await db.query(`SELECT * FROM events WHERE id = ?`, [query.insertId]);
-    return data;          
+    return data[0];          
   }
 
   async update (body) {
     let query = await db.query(`UPDATE events SET ? WHERE ?`, [body, this.id]);
     let data = await db.query(`SELECT * FROM events WHERE id = ?`, [this.id]);
 
-    return data;
+    return data[0];
   }
 
   async delete () {

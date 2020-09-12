@@ -1,16 +1,14 @@
-const { db } = require('../../db/db');
+const UserProject = require('../queries/UserProject');
+const Message = require('../queries/Message');
 
 const authMessage = async (req, res, next) => {
   let body = req.body;
 
   try {
-    
-    let userProject = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=?`, 
-      [req.user.id, body.project_id]
-    );
+
+    let userProject = await UserProject.byId(req.user.id, body.project_id);
   
-    if(userProject.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -38,9 +36,9 @@ const authMessageById = async (req, res, next) => {
 
   try {
     
-    let message = await db.query(`SELECT * FROM messages WHERE id=? AND user_id=?`, [id, req.user.id]);
-  
-    if(message.length < 1) {
+    let message = await Message.byId(id);
+
+    if(!message) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -67,9 +65,9 @@ const validateMessage = async (req, res, next) => {
   let id = req.params.id;
 
   try {
-    let data = await db.query(`SELECT * FROM messages WHERE id = ?`, [id]);
+    let message = await Message.byId(id);
 
-    if ( !data[0] ) {
+    if ( !message ) {
       return res.status(404).json({
         ok: false,
         err: {

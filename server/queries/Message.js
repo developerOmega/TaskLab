@@ -36,7 +36,7 @@ class Message extends Model {
     );
 
     let data = await db.query(`SELECT * FROM messages WHERE id = ?`, [query.insertId]);
-    return data[0 ];
+    return data[0];
   }
 
   async update(body) {

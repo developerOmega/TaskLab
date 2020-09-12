@@ -1,20 +1,16 @@
-const { db } = require('../../db/db');
+const UserTask = require('../queries/UserTask');
+const Task = require('../queries/Task');
+const UserProject = require('../queries/UserProject');
 
 const authTaskById = async (req, res, next) => {
   let taskId = req.params.id;
   
   try {
 
-    let task = await db.query(
-      `SELECT * FROM tasks WHERE id=?`, [taskId]
-    );
+    let task = await Task.byId(taskId)
+    let projectsPerUser = await UserProject.byId(req.user.id, task.project_id);
   
-    let projectsPerUser = await db.query(
-      `SELECT * FROM user_projects WHERE user_id = ? AND project_id = ?`,
-      [req.user.id, task[0].project_id]
-    );
-  
-    if( projectsPerUser.length <  1 ) {
+    if( !projectsPerUser ) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -40,13 +36,9 @@ const authTaksAdmin = async (req, res, next) => {
   let body = req.body;
 
   try {
+    let project = await UserProject.byIdAdmin(req.user.id, body.project_id);
     
-    let projects = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND user_projects.admin=?`, 
-      [req.user.id, body.project_id, 1]
-    );
-    
-    if(projects.length < 1) {
+    if(!project) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -73,14 +65,10 @@ const authTaksAdminById = async (req, res, next) => {
 
   try {
     
-    let task = await db.query(`SELECT * FROM tasks WHERE id=?`, [taskId]);
-  
-    let projects = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`,  
-      [req.user.id, task[0].project_id, 1]
-    );
+    let task = await Task.byId(taskId)
+    let userProject = await UserProject.byIdAdmin(req.user.id, task.project_id);
     
-    if(projects.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -103,13 +91,38 @@ const authTaksAdminById = async (req, res, next) => {
 
 }
 
+const validateUsersByTask = async (req, res, next) => {
+  let id = req.params.id;
+
+  try {
+    let data = await UserTask.byId(req.user.id, id);
+
+    if(!data) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "No tienes acceso a esta accion"
+        }
+      });
+    }
+    next();
+  } catch (err) {
+    return res.status(500).json({
+      ok: false,
+      err: {
+        name: err.name,
+        message: err.message
+      }
+    })
+  }
+}
+
 const validateTask = async (req, res, next) => {
   let id = req.params.id;
 
   try {
-    let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [id]);
-
-    if ( !data[0] ) {
+    let task = await Task.byId(id)
+    if ( !task ) {
       return res.status(404).json({
         ok: false,
         err: {
@@ -131,4 +144,4 @@ const validateTask = async (req, res, next) => {
 }
 
 
-module.exports = { authTaksAdmin, authTaksAdminById, authTaskById, validateTask };
+module.exports = { authTaksAdmin, authTaksAdminById, authTaskById, validateTask, validateUsersByTask };

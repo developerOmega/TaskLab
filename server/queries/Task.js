@@ -27,7 +27,7 @@ class Task extends Model {
     try {
       let data = await db.query(`SELECT * FROM tasks WHERE id=?`, [id]);
       if(!data[0]){
-        return data;
+        return false;
       }
       let instance = new Task(data[0]);
       return instance;

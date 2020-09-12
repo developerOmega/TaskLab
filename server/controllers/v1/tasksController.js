@@ -88,6 +88,32 @@ class TasksController {
     }
   }
 
+  static async updateStatus (req, res) {
+    let id = req.params.id;
+    let body = req.body;
+
+    try {
+      let task = await Task.byId(id);
+      let data = await task.update({
+        status: body.status
+      });
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          name: err.name,
+          message: err.message
+        }
+      });
+    }
+  }
+
   static async destroy (req, res) {
     let id = req.params.id;
 

@@ -61,7 +61,7 @@ class EventsController {
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {

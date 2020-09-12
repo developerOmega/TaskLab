@@ -1,17 +1,12 @@
-const { db } = require('../../db/db');
+const UserProject = require('../queries/UserProject');
 
 const authUserProjectAdmin = async (req, res, next) => {
   let body = req.body;
 
   try {
+    let userProject = await UserProject.byIdAdmin(req.user.id, body.project_id);
 
-
-    let userProject = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`,
-      [req.user.id, body.project_id, 1]
-    );
-
-    if(userProject.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -38,12 +33,9 @@ const authUserProjectById = async (req, res, next) => {
   let projectId = parseInt(req.params.project_id);
 
   try {
-    let userProject = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`,
-      [req.user.id, projectId, 1]
-    );
+    let userProject = await UserProject.byIdAdmin(req.user.id, projectId);
 
-    if(req.user.id !== userId && userProject.length < 1) {
+    if(req.user.id !== userId && !userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -70,12 +62,9 @@ const validateUserProject = async (req, res, next) => {
   let projectId = req.params.project_id;
 
   try {
-    let data = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=?`, 
-      [userId, projectId]
-    );
+    let userProject = await UserProject.byIdAdmin(userId, projectId);
 
-    if(!data[0]) {
+    if(!userProject) {
       return res.status(404).json({
         ok: false,
         err: {

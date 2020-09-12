@@ -1,4 +1,4 @@
-const { db } = require('../../db/db');
+const User = require('../queries/User');
 
 const authUserById = async (req, res, next) => {
   let userId = parseInt(req.params.id);
@@ -20,9 +20,9 @@ const validateUser = async (req, res, next) => {
   let id = req.params.id;
 
   try {
-    let user = await db.query( `SELECT * FROM users WHERE id = ?`, [id] );
+    let user = await User.byId(id);
 
-    if(!user[0]) {
+    if(!user) {
       return res.status(404).json({
         ok: false,
         err: {
@@ -49,11 +49,9 @@ const validateUsersPag = async (req, res, next) => {
   let end = req.query.end;
 
   try {
-    let data = init && end ? 
-    await db.query(`SELECT * FROM users WHERE id >= ? AND id <= ?`, [init, end]) :
-    await db.query(`SELECT * FROM users`);
+    let users = await User.paginate(init, end);
 
-    if(data.length < 1) {
+    if(users.length < 1) {
       return res.status(404).json({
         ok: false,
         err: {

@@ -1,27 +1,15 @@
-const { db } = require('../../db/db');
+const UserProject = require('../queries/UserProject');
+const UserTask = require('../queries/UserTask');
+const Task = require('../queries/Task');
 
 const authUserTaskAdmin = async (req, res, next) => {
   let body = req.body;
 
   try {
+    let task = await Task.byId(body.task_id);
+    let userProject = await UserProject.byIdAdmin(req.user.id, task.project_id);
 
-    let task = await db.query( `SELECT * FROM tasks WHERE id=?`, [body.task_id] );
-
-    if(task.length < 1) {
-      return res.status(400).json({
-        ok: false,
-        err: {
-          message: "No existe la terea"
-        }
-      });
-    }
-
-    let userProject = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`,
-      [req.user.id, task[0].project_id, 1]
-    );
-
-    if(userProject.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -49,14 +37,10 @@ const authUserTaskAdminById = async (req, res, next) => {
 
   try {
 
-    let task = await db.query( `SELECT * FROM tasks WHERE id=?`, [taskId] );
+    let task = await Task.byId(taskId);
+    let userProject = await UserProject.byIdAdmin(req.user.id, task.project_id);
 
-    let userProject = await db.query(
-      `SELECT * FROM user_projects WHERE user_id=? AND project_id=? AND admin=?`,
-      [req.user.id, task[0].project_id, 1]
-    );
-
-    if(userProject.length < 1) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {
@@ -83,12 +67,9 @@ const validateUserTask = async (req, res, next) => {
   let taskId = req.params.task_id;
 
   try {
-    let data = await db.query(
-      `SELECT * FROM user_tasks WHERE user_id=? AND task_id=?`,
-      [userId, taskId]
-    );
+    let userTask = await UserTask.byId(userId, taskId);
 
-    if(!data[0]) {
+    if(!userTask) {
       return res.status(404).json({
         ok: false,
         err: {
