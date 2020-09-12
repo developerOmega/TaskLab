@@ -9,12 +9,18 @@ class UserProject extends Model{
   }
 
   static async create (body) {
-    let data = await db.query(
-      `INSERT INTO user_projects (user_id, project_id, admin) VALUES (?,?,?)`,
+
+    let query = await db.query(
+      `INSERT INTO user_projects (user_id, project_id, admin) VALUES (?,?, ?)`, 
       [ body.user_id, body.project_id, body.admin ]
     )
 
-    return data;
+    let data = await db.query(
+      `SELECT * FROM user_projects WHERE user_id = ? AND project_id = ?`, 
+      [body.user_id, body.project_id]
+    );
+
+    return data[0];
     
   }
 

@@ -1,20 +1,9 @@
-const { db } = require('../../../db/db');
 const DropboxApi = require('../../dropbox/dropbox');
-
-function imageUrl(url) {
-  
-  if(url.match(/www.dropbox.com/)){
-    let regex = /www.dropbox.com/;
-    let imageUrl = url.replace(regex, 'dl.dropboxusercontent.com');
-    imageUrl = imageUrl.replace( /[?]dl=0/, '' );
-    return imageUrl;
-  }
-
-}
+const User = require('../../queries/User');
 
 class FilesController {
 
-  static async user (req, res) {
+  static async userPost (req, res) {
     let id = req.params.id;
     let img = req.files.img.name;    
     
@@ -23,38 +12,142 @@ class FilesController {
     let contents = req.files.img.data;
     
     DropboxApi.on().upload(path, contents, (err, data) => {
+      if(err){
+        return res.status(500).json({
+            ok: false,
+            err
+        });
+      }
+            
+      let dataPath = data.path_display;
+            
+      DropboxApi.on().sharedLink(dataPath, async (err, sharedLink) => {
         if(err){
-            console.log(err);
             return res.status(500).json({
                 ok: false,
-                err
-            });
+                err: {message: err.message}
+            }); 
         }
+        
+        let user = await User.byId(id);
+        let data = await user.update({
+          img: User.imageUrl(sharedLink.url)
+        });
             
-        let dataPath = data.path_display;
-            
-        DropboxApi.on().sharedLink(dataPath, async (err, sharedLink) => {
-            if(err){
-                return res.status(500).json({
-                    ok: false,
-                    err: {message: err.message}
-                }); 
-            }
+        req.user = data;
 
-            let update = await db.query(
-              `UPDATE users SET img=? WHERE id=?`, [ imageUrl(sharedLink.url), id ]
-            )
+        return res.json({
+            ok: true,
+            data,
+            message: "Se actualizo la imagen"
+        });
+      });
+    });
+  }
 
-            let data = await db.query( `SELECT * FROM users WHERE id=?`, [id] );
-            req.user = data;
+  static async userDestroy (req, res) {
+    let id = req.params.id;
+    let user = await User.byId(id);
 
-            return res.json({
-                ok: true,
-                data: data[0],
-                message: "Se actualizo la imagen"
-            });
+    if(user.img === '/images/default.png' ){
+      return res.status(400).json({
+        ok: false,
+        err: { message: "El usuario aún no cuenta con una imagen" }
+      })
+    } 
+
+    let cutImg = user.img.split('/');
+    let fileName = cutImg[cutImg.length - 1];
+    let path = `/${fileName}`;
+
+    DropboxApi.on().delete(path, async (err, response) => {
+      if(err){
+        return res.status(400).json({
+          ok: false,
+          err
         })
-    
+      }
+
+      let data = await user.update({
+        img: '/images/default.png'
+      });
+      req.user = data;
+
+      return res.json({
+        ok: true,
+        message: "La imagen se elimino con exito",
+        data: response
+      });
+    });
+  }
+
+  static async userUpdate(req, res) {
+    let id = req.params.id;
+    let img = req.files.img.name;  
+
+    let user = await User.byId(id);
+
+    if(user.img === '/images/default.png'){
+      return res.status(400).json({
+        ok: false,
+        err: { message: "El usuario aún no cuenta con una imagen" }
+      })
+    } 
+
+    let cutImg = user.img.split('/');
+    let fileName = cutImg[cutImg.length - 1];
+    let path = `/${fileName}`;
+
+    DropboxApi.on().delete(path, (err, response) => {
+      if(err){
+        return res.status(400).json({
+          ok: false,
+          err
+        })
+      }
+
+      fileName = `${id}${Date.now()}${img}`;
+      path = `/${fileName}`;
+      let contents = req.files.img.data;
+
+      DropboxApi.on().upload(path, contents, (err, data) => {
+        if(err){
+          return res.status(500).json({
+            ok: false,
+            err: {
+              name: err.name,
+              message: err.message
+            }
+          });
+        }
+                
+        let dataPath = data.path_display;
+                
+        DropboxApi.on().sharedLink(dataPath, async (err, sharedLink) => {
+          if(err){
+            return res.status(500).json({
+              ok: false,
+              err: {
+                name: err.name,
+                message: err.message
+              }
+            }); 
+          }
+
+          let data = await user.update({
+            img: User.imageUrl(sharedLink.url)
+          });
+          console.log(data);
+          req.user = data;
+
+          return res.json({
+            ok: true,
+            user: data,
+            message: "Se actualizo la imagen"
+          });
+        });
+
+      });
     });
   }
 

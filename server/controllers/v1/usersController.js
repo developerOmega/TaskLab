@@ -1,4 +1,4 @@
-const { db } = require('../../../db/db');
+const User = require('../../queries/User');
 const bcrypt = require('bcrypt');
 
 class UsersController {
@@ -8,14 +8,11 @@ class UsersController {
     let end = req.query.end;
 
     try {
-      
-      let data = init && end ? 
-        await db.query(`SELECT * FROM users WHERE id >= ? AND id <= ?`, [init, end]) :
-        await db.query(`SELECT * FROM users`);
+      let data = await User.paginate(init, end);
         
       return res.status(200).json({
         ok: true,
-        data: data
+        data
       });
 
     } 
@@ -33,14 +30,11 @@ class UsersController {
     let id = req.params.id;
 
     try{
-      let data = await db.query(
-        `SELECT * FROM users WHERE id = ?`,
-        [id]
-      );
+      let data = await User.byId(id);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch(err) {
@@ -55,22 +49,27 @@ class UsersController {
     let body = req.body;
 
     try {
-      let query = await db.query(
-        `INSERT INTO users (name, email, password, img, verify) VALUES (?,?,?,?,?)`,
-        [body.name, body.email, bcrypt.hashSync(body.password, 10), body.img, body.verify]
-      );
-
-      let data = await db.query( `SELECT * FROM users WHERE id = ?`, [query.insertId] );
+      
+      let data = await User.create({
+        name: body.name,
+        email: body.email,
+        password: bcrypt.hashSync(body.password, 10),
+        img: body.img,
+        verify: body.verify
+      });
 
       res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
       res.status(400).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       })
     }
   }
@@ -78,17 +77,15 @@ class UsersController {
   static async update(req, res) {
     let body = req.body;
     let id = req.params.id;
-
     delete body.password;
 
     try {
-      
-      let query = await db.query( `UPDATE users SET ? WHERE id = ?`, [body, id] );
-      let data = await db.query( `SELECT * FROM users WHERE id = ?`, [id] );
+      let user = await User.byId(id);
+      let data = await user.update(body);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -106,8 +103,8 @@ class UsersController {
     let id = req.params.id;
 
     try {
-      
-      let data = await db.query(`DELETE FROM users WHERE id = ?`, [id]);
+      let user = await User.byId(id);
+      await user.delete();
 
       return res.status(200).json({
         ok: true,
@@ -128,13 +125,8 @@ class UsersController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT projects.id, projects.name, projects.description, projects.status, projects.user_id, projects.updated_at, projects.created_at
-        FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
-        INNER JOIN users ON user_projects.user_id=users.id 
-        WHERE users.id=?;`,
-        [id]
-      );
+      let user = await User.byId(id);
+      let data = await user.projects();
 
       if(data.length < 1) {
         return res.status(404).json({

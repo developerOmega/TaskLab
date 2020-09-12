@@ -1,4 +1,4 @@
-const { db } = require('../../../db/db');
+const User = require('../../queries/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { JwtEnv } = require('../../../config/config');
@@ -9,11 +9,9 @@ class UserAuthController {
     let body = req.body;
 
     try {
-      let user = await db.query(`SELECT * FROM users WHERE email=?`, [body.email]);
-      
-      console.log(user[0]);
+      let user = await User.byEmail(body.email);
 
-      if(!user[0]) {
+      if(!user) {
         return res.status(401).json({
           ok: false,
           err: {
@@ -22,7 +20,7 @@ class UserAuthController {
         });
       }
 
-      if( !bcrypt.compareSync(body.password, user[0].password ) ) {
+      if( !bcrypt.compareSync(body.password, user.password ) ) {
         return res.status(401).json({
           ok: false,
           err: {
@@ -31,11 +29,11 @@ class UserAuthController {
         });
       }
 
-      let token = jwt.sign({ user: user[0] }, JwtEnv.privateKey, JwtEnv.signOptions );
+      let token = jwt.sign({ user }, JwtEnv.privateKey, JwtEnv.signOptions );
 
       return res.status(200).json({
         ok: true,
-        user: user[0],
+        user,
         token
       });
       
@@ -43,7 +41,10 @@ class UserAuthController {
 
       return res.status(500).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       });
     }
   }

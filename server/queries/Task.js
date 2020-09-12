@@ -3,8 +3,8 @@ const {db} = require('../../db/db');
 
 class Task extends Model {
   constructor(task) {
-    super(taks);
-    this.description = taks.description;
+    super(task);
+    this.description = task.description;
     this.status = task.status;
     this.time_init = task.task_init;
     this.time_end = task.task_end;
@@ -12,13 +12,20 @@ class Task extends Model {
   }
 
   static async all () {
-    let data = await db.query(`SELECT * FROM taks`);
+    let data = await db.query(`SELECT * FROM tasks`);
+    return data;
+  }
+
+  static async paginate (init = 0, end = 0) {
+    let data = init != 0 && end != 0 ? 
+      await db.query(`SELECT * FROM tasks WHERE id >= ? AND id <= ?`, [inti, end]) :
+      await db.query(`SELECT * FROM tasks`);
     return data;
   }
 
   static async byId(id) {
     try {
-      let data = await db.query(`SELECT * FROM taks WHERE id=?`, [id]);
+      let data = await db.query(`SELECT * FROM tasks WHERE id=?`, [id]);
       if(!data[0]){
         return data;
       }
@@ -39,20 +46,20 @@ class Task extends Model {
     return data[0];
   }
 
-  async update(data) {
+  async update(body) {
     let query =  await db.query(`UPDATE tasks SET ? WHERE id = ?`, [body, this.id]);
     let data = await db.query( `SELECT * FROM tasks WHERE id = ?`, [this.id]);
     return data[0];
   }
 
-  async delete(data) {
-    let data = await db.query( `DELETE FROM tasks WHERE id = ?`, [id]);
+  async delete() {
+    let data = await db.query( `DELETE FROM tasks WHERE id = ?`, [this.id]);
     return data;
   }
 
   async users() {
     let data = await db.query(
-      `SELECT users.id, users.name, users.img, users.email, users.verify, users.actice, users.updated_at, users.created_at
+      `SELECT users.id, users.name, users.img, users.email, users.verify, users.active, users.updated_at, users.created_at
       FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id
       INNER JOIN users ON user_tasks.user_id=users.id
       WHERE tasks.id=?;`,

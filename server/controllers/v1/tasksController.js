@@ -1,4 +1,4 @@
-const { db } = require("../../../db/db");
+const Task = require('../../queries/Task');
 
 class TasksController {
   
@@ -7,10 +7,7 @@ class TasksController {
     let end = req.query.end;
 
     try {
-      let data = init && end ? 
-        await db.query(`SELECT * FROM tasks WHERE id >= ? AND id <= ?`, [inti, end]) :
-        await db.query(`SELECT * FROM tasks`);
-
+      let data = await Task.paginate(init, end);
 
       if( data.length < 1 ){
         return res.status(404).json({
@@ -34,11 +31,11 @@ class TasksController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [id]);
+      let data = await Task.byId(id);
 
       return res.status(200).json({
         ok: true, 
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -53,16 +50,11 @@ class TasksController {
     let body = req.body;
 
     try {
-      let query = await db.query(
-        `INSERT INTO tasks (description, status, time_init, time_end, project_id) VALUES (?,?,?,?, ?)`,
-        [body.description, body.status, body.time_init, body.time_end, body.project_id]
-      );
-
-      let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [query.insertId])
+      let data = await Task.create(body);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       });
 
     } catch (err) {
@@ -78,17 +70,20 @@ class TasksController {
     let body = req.body;
 
     try {
-      let query =  await db.query(`UPDATE tasks SET ? WHERE id = ?`, [body, id]);
-      let data = await db.query( `SELECT * FROM tasks WHERE id = ?`, [id]);
+      let task = await Task.byId(id);
+      let data = await task.update(body);
 
       return res.status(200).json({
         ok: true,
-        data: data[0]
+        data
       })
     } catch (err) {
       return res.status(400).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       });
     }
   }
@@ -97,8 +92,9 @@ class TasksController {
     let id = req.params.id;
 
     try {
-      let data = await db.query( `DELETE FROM tasks WHERE id = ?`, [id]);
-
+      let task = await Task.byId(id);
+      await task.delete();
+      
       return res.status(200).json({
         ok: true,
         message: "La tarea se ha eliminado con exito"
@@ -106,7 +102,10 @@ class TasksController {
     } catch (err) {
       return res.status(500).json({
         ok: false,
-        err
+        err: {
+          name: err.name,
+          message: err.message
+        }
       });
     }
   }
@@ -115,13 +114,9 @@ class TasksController {
     let id = req.params.id;
 
     try {
-      let data = await db.query(
-        `SELECT users.id, users.name, users.img, users.email
-        FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id
-        INNER JOIN users ON user_tasks.user_id=users.id
-        WHERE tasks.id=?;`,
-        [id]
-      );
+
+      let task = await Task.byId(id);
+      let data = await task.users();
 
       if( data.length < 1 ) {
         return res.status(404).json({
