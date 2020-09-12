@@ -27,6 +27,7 @@ class User extends Model {
   static async byId(id) {
     try {
       let data = await db.query(`SELECT * FROM users WHERE id=?`, [id]);
+      
       if(!data[0]) {
         return false;
       }
@@ -52,18 +53,20 @@ class User extends Model {
 
   static async create(body) {
     let query = await db.query(
-      `INSERT INTO users (name, email, password, verify) VALUES (?,?,?,?)`,
+      `INSERT INTO users (name, email, password, verify) VALUES (?,?,?,?) RETURNING *`,
       [body.name, body.email, body.password, body.verify]
     );
 
-    let data = await db.query( `SELECT * FROM users WHERE id = ?`, [query.insertId] );
-    return data[0];
+    // let data = await db.query( `SELECT * FROM users WHERE id = ?`, [query.insertId] );
+    
+    return query[0];
   }
 
   async update(body) {
-    let query = await db.query( `UPDATE users SET ? WHERE id = ?`, [body, this.id] );
-    let data = await db.query( `SELECT * FROM users WHERE id = ?`, [this.id] );
-    return data[0];
+    
+    let query = await db.queryPatch( `UPDATE users SET data? WHERE id=? RETURNING *`, [body, this.id] );
+    // let data = await db.query( `SELECT * FROM users WHERE id = ?`, [this.id] );
+    return query[0];
   }
 
   async delete() {

@@ -30,7 +30,6 @@ class Model {
   async delete () {
     return 0;
   }
-
 }
 
 module.exports = Model;
