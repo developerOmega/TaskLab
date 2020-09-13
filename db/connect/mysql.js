@@ -2,12 +2,12 @@ const mysql = require('mysql2');
 
 class MySQL {
 
-  constructor(host, user, password, database) {
+  constructor(data) {
     this.connection;
-    this.host = host;
-    this.user = user;
-    this.password = password;
-    this.database = database;
+    this.host = data.host;
+    this.user = data.user;
+    this.password = data.password;
+    this.database = data.database;
 
     this.init();
   }

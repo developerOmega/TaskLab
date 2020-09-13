@@ -42,19 +42,15 @@ class Event extends Model{
 
   static async create (body) {
     let query = await db.query(
-      `INSERT INTO events (name, description, time_init, time_end, project_id) VALUES (?,?,?,?, ?)`,
+      `INSERT INTO events (name, description, time_init, time_end, project_id) VALUES (?,?,?,?, ?) RETURNING *`,
       [body.name, body.description, body.time_init, body.time_end, body.project_id]
     )
-
-    let data = await db.query(`SELECT * FROM events WHERE id = ?`, [query.insertId]);
-    return data[0];          
+    return query[0];
   }
 
   async update (body) {
-    let query = await db.query(`UPDATE events SET ? WHERE ?`, [body, this.id]);
-    let data = await db.query(`SELECT * FROM events WHERE id = ?`, [this.id]);
-
-    return data[0];
+    let query = await db.queryPatch(`UPDATE events SET data? WHERE id=? RETURNING *`, [body, this.id]);
+    return query[0];
   }
 
   async delete () {

@@ -43,20 +43,20 @@ class JwtEnv {
 // ====================================
 // Base de datos
 // ====================================
-class DatabaseEnv {
-  static host = nodeEnv === 'development' ? 'localhost' : process.env.HOST;
-  static user = nodeEnv === 'development' ? 'root' : process.env.USER;
-  static database = nodeEnv === 'development' ? 'task_lab' : process.env.DATABASE;
-  static password = nodeEnv === 'development' ? '1234' : process.env.PASSWORD;
-}
-
 // class DatabaseEnv {
 //   static host = nodeEnv === 'development' ? 'localhost' : process.env.HOST;
-//   static user = nodeEnv === 'development' ? 'postgres' : process.env.USER;
+//   static user = nodeEnv === 'development' ? 'root' : process.env.USER;
 //   static database = nodeEnv === 'development' ? 'task_lab' : process.env.DATABASE;
 //   static password = nodeEnv === 'development' ? '1234' : process.env.PASSWORD;
-//   static port = nodeEnv === 'development' ? '5432' : process.env.PORT;
 // }
+
+class DatabaseEnv {
+  static host = nodeEnv === 'development' ? 'localhost' : process.env.HOST;
+  static user = nodeEnv === 'development' ? 'postgres' : process.env.USER;
+  static database = nodeEnv === 'development' ? 'task_lab' : process.env.DATABASE;
+  static password = nodeEnv === 'development' ? '1234' : process.env.PASSWORD;
+  static port = nodeEnv === 'development' ? '5432' : process.env.PORT;
+}
 
 
 module.exports = {

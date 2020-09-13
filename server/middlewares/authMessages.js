@@ -37,8 +37,9 @@ const authMessageById = async (req, res, next) => {
   try {
     
     let message = await Message.byId(id);
+    let userProject = await UserProject.byId(req.user.id, message.project_id);
 
-    if(!message) {
+    if(!userProject) {
       return res.status(403).json({
         ok: false,
         err: {

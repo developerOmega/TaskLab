@@ -38,18 +38,15 @@ class Task extends Model {
 
   static async create(body) {
     let query = await db.query(
-      `INSERT INTO tasks (description, status, time_init, time_end, project_id) VALUES (?,?,?,?, ?)`,
+      `INSERT INTO tasks (description, status, time_init, time_end, project_id) VALUES (?,?,?,?, ?) RETURNING *`,
       [body.description, body.status, body.time_init, body.time_end, body.project_id]
     );
-
-    let data = await db.query(`SELECT * FROM tasks WHERE id = ?`, [query.insertId])
-    return data[0];
+    return query[0];
   }
 
   async update(body) {
-    let query =  await db.query(`UPDATE tasks SET ? WHERE id = ?`, [body, this.id]);
-    let data = await db.query( `SELECT * FROM tasks WHERE id = ?`, [this.id]);
-    return data[0];
+    let query =  await db.queryPatch(`UPDATE tasks SET data? WHERE id = ? RETURNING *`, [body, this.id]);
+    return query[0];
   }
 
   async delete() {

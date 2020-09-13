@@ -9,16 +9,10 @@ class UserTask extends Model {
 
   static async create (body) {
     let query = await db.query(
-      `INSERT INTO user_tasks (user_id, task_id) VALUES (?,?)`, 
+      `INSERT INTO user_tasks (user_id, task_id) VALUES (?,?) RETURNING *`, 
       [ body.user_id, body.task_id ]
     )
-
-    let data = await db.query(
-      `SELECT * FROM user_tasks WHERE user_id = ? AND task_id = ?`, 
-      [body.user_id, body.task_id]
-    );
-
-    return data[0];
+    return query[0];
   }
 
   static async byId (userId, taskId) {

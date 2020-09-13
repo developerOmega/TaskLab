@@ -45,18 +45,15 @@ class Project extends Model{
 
   static async create ( body ) {
     let query = await db.query(
-      `INSERT INTO projects (name, description, status, user_id) VALUES (?,?,?,?)`,
+      `INSERT INTO projects (name, description, status, user_id) VALUES (?,?,?,?) RETURNING *`,
       [body.name, body.description, body.status, body.user_id]
-    );  
-    let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [query.insertId]);
-    return data[0];
+    );      
+    return query[0];
   }
 
   async update ( body ) {
-    let query = await db.query(`UPDATE projects SET ? WHERE id =  ?`, [body, this.id]);
-    let data = await db.query(`SELECT * FROM projects WHERE id = ?`, [this.id]);
-
-    return data[0];
+    let query = await db.queryPatch(`UPDATE projects SET data? WHERE id =  ? RETURNING *`, [body, this.id]);
+    return query[0];
   }
 
   async delete () {

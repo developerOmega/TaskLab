@@ -45,10 +45,7 @@ class EventsController {
     } catch (err) {
       return res.status(500).json({
         ok: false,
-        err: {
-          name: err.name,
-          message: err.message
-        }
+        err
       });
     }
   }
@@ -90,10 +87,7 @@ class EventsController {
     } catch (err) {
       return res.status(400).json({
         ok: false,
-        err: {
-          name: err.name,
-          message: err.message
-        }
+        err
       });
     }
   }
