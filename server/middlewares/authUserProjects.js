@@ -62,7 +62,7 @@ const validateUserProject = async (req, res, next) => {
   let projectId = req.params.project_id;
 
   try {
-    let userProject = await UserProject.byIdAdmin(userId, projectId);
+    let userProject = await UserProject.byId(userId, projectId);
 
     if(!userProject) {
       return res.status(404).json({
