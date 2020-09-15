@@ -1,5 +1,7 @@
 const Migration = require('./Migration');
 
+// Clase que ejecuta la todas las consulta DB
+
 class ExecuteAll extends Migration {
   
   static async run() {

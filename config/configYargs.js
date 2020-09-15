@@ -1,3 +1,5 @@
+//Configurar comandos de yargs
+
 const argv = require('yargs').options({
   hola: {
     alias: 'ho',

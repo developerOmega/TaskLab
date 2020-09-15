@@ -1,6 +1,8 @@
 const Migration = require('./Migration');
 const argv = require('../../config/configYargs');
 
+// Ejecutar promesa que administra comandos yars
+
 let migration = new Migration;
 migration.excuteQuery(argv.query)
   .then(data => console.log(data))

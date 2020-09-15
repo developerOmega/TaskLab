@@ -1,7 +1,9 @@
 const { Client } = require('pg');
 
+// Clase que ejecuta postgreSQL en el proyecto
 class PostgreSQL {
 
+  // Constructor recibe los parametros host, user, password, database y port
   constructor ( data ) {
     this.connection;
     this.host = data.host;
@@ -13,6 +15,7 @@ class PostgreSQL {
     this.init();
   }
 
+  // Metodo que inicializa db
   init(){
     
     this.connection = new Client({
@@ -27,10 +30,13 @@ class PostgreSQL {
 
   }
 
+  // Metodo que retorna retorna instancia db
   get on() {
     return this.connection;
   }
 
+  // Metodo que retorna informacion de query
+  // Recibe parametros -> query:string (consulta), data:array (datos privados)
   query(query = '', data = []) {
     
     return new Promise((resolve, reject) => {
@@ -51,6 +57,12 @@ class PostgreSQL {
 
   }
 
+  // Metodo que retorna la actualizacion de una tabla
+  /* 
+    Recibe parametros -> 
+      query:string = 'UPDATE table_name SET data? WHERE id=?', 
+      data:array[body:object, id:number]
+  */ 
   queryPatch(query = '', data = []) {
     return new Promise ((resolve, reject) => {
       let body = data[0];
@@ -74,6 +86,8 @@ class PostgreSQL {
     })   
   }
 
+  // Metodo que retorna query UPDATE con los datos body
+  // Recibe parametros -> query:string (consulta), body:object (datos de actualizacion)
   static statementsPatch(query, body) {
     let set = [];
 
@@ -85,6 +99,8 @@ class PostgreSQL {
     return queryProto.join('');
   }
 
+  // Metodo que retorna query con los placeholdres '?' remplzados a '$1', '$2', ...
+  // Recibe parametro -> data:string (query)
   static statements(data) {
     let dataProto = data.split('?');
     

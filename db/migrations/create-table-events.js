@@ -1,6 +1,9 @@
 const Migration = require('./Migration');
 const { db } = require('../db');
 
+// Clase que ejecuta la consulta DB para crear tabla 'events'
+// Se ejecuta trigger para actualizat columna updated_at
+
 class CreateTableEvent extends Migration {
 
   static async run() {

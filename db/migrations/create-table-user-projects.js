@@ -1,6 +1,10 @@
 const Migration = require('./Migration');
 const { db } = require('../db');
 
+// Clase que ejecuta la consulta DB para crear tabla pivote 'user_projects'
+// Relaciona tabla users y projects
+// Agrega columna admin
+
 class CreateTableUserProject extends Migration {
 
   static async run() {

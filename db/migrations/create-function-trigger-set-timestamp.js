@@ -1,6 +1,9 @@
 const { db } = require('../db');
 const Migration = require('./Migration');
 
+// Clase que ejecuta la consulta DB para crear funcion 'trigger_set_timestamp'
+// La funcion actualiza la columna updated_at de las tablas 
+
 class CreateFunctionTriggerSetTimestam extends Migration {
 
   static async run () {

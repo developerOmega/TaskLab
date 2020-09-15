@@ -1,7 +1,9 @@
 const mysql = require('mysql2');
 
+// Clase para ejecutar mysql en proyecto
 class MySQL {
 
+  // Contructor recibe los datos host, user, password y database
   constructor(data) {
     this.connection;
     this.host = data.host;
@@ -12,6 +14,7 @@ class MySQL {
     this.init();
   }
 
+  // Metodo que inicializa base de datos
   init(){
     
     this.connection = mysql.createConnection({
@@ -25,10 +28,13 @@ class MySQL {
 
   }
 
+  // Metodo que retorna la instancia de la db 
   get on() {
     return this.connection;
   }
 
+  // Metodo para agregar queries
+  // recibe parametros query:string (consulta) y data:array (datos privados)
   query(query = '', data = []) {
     
     return new Promise((resolve, reject) => {
