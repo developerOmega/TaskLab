@@ -1,6 +1,12 @@
 const UserProject = require('../../queries/UserProject');
 
+// Clase que almacena los controladores de ruta '/api/v1/user-projects'
+// Controladores: post, destroy
+
 class UserProductsController {
+
+  // Metodo que inserta nuevo registro de la tabla 'user_projects', retorna json con el nuevo registro
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async post (req, res) {
     let body = req.body;
 
@@ -20,6 +26,8 @@ class UserProductsController {
     }
   }
 
+  // Metodo que elimina el registro por id de la tabla 'user_projects', retorna json con mensaje
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async destroy (req, res) {
     let userId = req.params.user_id;
     let projectId = req.params.project_id;

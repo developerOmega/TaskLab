@@ -1,8 +1,14 @@
 const DropboxApi = require('../../dropbox/dropbox');
 const User = require('../../queries/User');
 
+// Clase que almacena los controladores de ruta '/api/v1/files/users'
+// Los controladores controlan archivo de dropbox
+// Controladores: userPost, userUpdate, userDestroy
+
 class FilesController {
 
+  // Metodo que sube imagen de la culumna 'img' de la tabla 'users' a Dropbox, retorna json con el registro actualizado
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async userPost (req, res) {
     let id = req.params.id;
     let img = req.files.img.name;    
@@ -45,6 +51,8 @@ class FilesController {
     });
   }
 
+  // Metodo que elimina la imagen del campo 'img' de tabla 'users' a Dropbox, retorna json con el registro img = '/images/default.png'
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async userDestroy (req, res) {
     let id = req.params.id;
     let user = await User.byId(id);
@@ -81,6 +89,8 @@ class FilesController {
     });
   }
 
+  // Metodo que actualiza la imagen del campo 'img' de la tabla 'users' a Dropbox, retorna json con el registro actualizado
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async userUpdate(req, res) {
     let id = req.params.id;
     let img = req.files.img.name;  

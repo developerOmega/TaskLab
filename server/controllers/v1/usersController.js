@@ -1,8 +1,13 @@
 const User = require('../../queries/User');
 const bcrypt = require('bcrypt');
 
+// Clase que almacena los controladores de ruta '/api/v1/users'
+// Controladores: index, show, post, update, destroy, indexProjects
+
 class UsersController {
 
+  // Metodo que retorna json con la paginacion de todos los usuarios 
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async index (req, res) {
     let init = req.query.init;
     let end = req.query.end;
@@ -26,6 +31,8 @@ class UsersController {
 
   }
 
+  // Metodo que retorna json con un usuario por id
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async show(req, res) {
     let id = req.params.id;
 
@@ -45,6 +52,8 @@ class UsersController {
     }
   }
 
+  // Metodo que inserta nuevo registro de la tabla 'users', retorna json con nuevo registro
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async post(req, res) {
     let body = req.body;
 
@@ -74,6 +83,8 @@ class UsersController {
     }
   }
 
+  // Metodo que actualiza registro por id de la tabla 'users', retorna json con registro actualizado
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async update(req, res) {
     let body = req.body;
     let id = req.params.id;
@@ -99,6 +110,8 @@ class UsersController {
 
   }
 
+  // Metodo que elimina registro por id de tabla 'users', retorna json con mensaje
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async destroy(req, res) {
     let id = req.params.id;
 
@@ -121,6 +134,8 @@ class UsersController {
     }
   }
 
+  // Metodo que retorna json con los proyectos de un usuario
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async indexProjects(req, res) {
     let id = req.params.id;
 

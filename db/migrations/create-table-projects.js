@@ -3,7 +3,7 @@ const { db } = require('../db');
 
 
 // Clase que ejecuta la consulta DB para crear tabla 'projects'
-// Se ejecuta trigger para actualizat columna updated_at
+// Se ejecuta trigger para actualizar columna updated_at
 
 class CreateTableProject extends Migration {
 

@@ -1,8 +1,13 @@
 const Project = require("../../queries/Project");
 const UserProject = require('../../queries/UserProject');
 
+// Clase que almacena los controladores de ruta '/api/v1/projects'
+// Controladores: index, show, post, update, destroy, showUser, indexUsers, indexEvents, indexMessages, indexTasks 
+
 class ProjectsController {
 
+  // Metodo que retorna json con la paginacion de todos los proyectos
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async index (req, res) {
     let init = req.query.init;
     let end = req.query.end;
@@ -25,6 +30,8 @@ class ProjectsController {
 
   }
 
+  // Metodo  que retorna json con un proyecto por id
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async show (req, res) {
     let id = req.params.id;
 
@@ -45,6 +52,8 @@ class ProjectsController {
     }
   }
 
+  // Metodo que inserta nuevo registro de la tabla 'projects', retorna json con el nuevo registro
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async post (req, res) {
     let body = req.body;
 
@@ -78,6 +87,8 @@ class ProjectsController {
     }
   }
 
+  // Metodo que actualiza registro por id de la tabla 'projects', retorna json con registro actualizado
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async update (req, res) {
     let id =  req.params.id;
     let body = req.body;
@@ -106,6 +117,8 @@ class ProjectsController {
     }
   }
 
+  // Metodo que elimina registro por id de la tabla 'projects', retorna json con informacion
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async delete (req, res){
     let id = req.params.id;
 
@@ -127,6 +140,9 @@ class ProjectsController {
     }
   }
 
+
+  // Metodo que retorna json con el usuario creador del protecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async showUser (req, res) {
     let id = req.params.id;
 
@@ -158,6 +174,8 @@ class ProjectsController {
 
   }
 
+  // Metodo que retorna json con los usuarios pertenecientes a un proyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async indexUsers (req, res) {
     let id = req.params.id;
 
@@ -188,6 +206,8 @@ class ProjectsController {
     }
   }
 
+  // Metodod que retorna json con los mensajes pertenecientes a un proyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async indexMessages (req, res) {
     let id = req.params.id;
 
@@ -218,6 +238,8 @@ class ProjectsController {
     }
   }
 
+  // Metodo que retorna json con los eventos pertenecientes a un proyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async indexEvents(req, res) {
     let id = req.params.id;
 
@@ -248,6 +270,8 @@ class ProjectsController {
     }
   }
 
+  // Metodo  que retorna json con las tareas pertenecientes a un proyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async indexTasks(req, res) {
     let id = req.params.id;
 

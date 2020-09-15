@@ -1,6 +1,12 @@
 const UserTask = require('../../queries/UserTask');
 
+// Clase que almacena los controladores de ruta '/api/v1/user-tasks'
+// Controladores: post, destroy
+
 class UserTasksController {
+
+  // Metodo que inserta nuevo registro de la tabla 'user_tasks', retorna json con el nuevo registro
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async post (req, res) {
     let body = req.body;
 
@@ -20,6 +26,8 @@ class UserTasksController {
     }
   }
 
+  // Metodo que elimina el registro por id de la tabla 'user_tasks', retorna json con mensaje
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async destroy (req, res) {
     let userId = req.params.user_id;
     let taskId = req.params.task_id;

@@ -1,7 +1,12 @@
 const Task = require('../../queries/Task');
 
+// Clase que almacena los controladores de ruta '/api/v1/tasks'
+// Controladores: index, show, post, update, updateStatus, destroy, indexUsers
+
 class TasksController {
   
+  // Metodo que retorna json con la paginacion de todas las tareas
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async index (req, res) {
     let init = req.query.init;
     let end = req.query.end;
@@ -27,6 +32,8 @@ class TasksController {
     }
   }
 
+  // Metodo que retorna json de una tarea por id
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async show (req, res) {
     let id = req.params.id;
 
@@ -46,6 +53,8 @@ class TasksController {
     }
   }
 
+  // Metodo inserta un nuevo registro en la tabla 'tasks', retorna json con el nuevo registro
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async post (req, res) {
     let body = req.body;
 
@@ -65,6 +74,8 @@ class TasksController {
     }
   }
 
+  // Metodo que actualiza un registro por id de la tabla 'tasks', retorna json con el registro actualizado
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async update (req, res){
     let id = req.params.id;
     let body = req.body;
@@ -88,6 +99,8 @@ class TasksController {
     }
   }
 
+  // Metodo que actualiza el status del resgistro de la tabla 'tasks', retorna json con el registro actualizado;
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async updateStatus (req, res) {
     let id = req.params.id;
     let body = req.body;
@@ -111,6 +124,8 @@ class TasksController {
     }
   }
 
+  // Metodo que elimina registro por id de la tabla 'tasks', retorna json con informacion
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async destroy (req, res) {
     let id = req.params.id;
 
@@ -133,6 +148,8 @@ class TasksController {
     }
   }
 
+  // Metodo que retorna los usuarios pertenecientes a una tarea
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async indexUsers(req, res) {
     let id = req.params.id;
 

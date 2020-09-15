@@ -2,7 +2,7 @@ const Migration = require('./Migration');
 const { db } = require('../db');
 
 // Clase que ejecuta la consulta DB para crear tabla 'tasks'
-// Se ejecuta trigger para actualizat columna updated_at
+// Se ejecuta trigger para actualizar columna updated_at
 
 class CreateTableTask extends Migration {
 

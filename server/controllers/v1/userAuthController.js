@@ -3,8 +3,13 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { JwtEnv } = require('../../../config/config');
 
+// Clase que almacena los controladores de ruta '/api/v1/login/users'
+// Controladores: login, logout
+
 class UserAuthController {
   
+  // Metodo que autentica el usuario con token JWT
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async login ( req, res ) {
     let body = req.body;
 
