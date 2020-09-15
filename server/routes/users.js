@@ -2,7 +2,8 @@ const { UsersController } = require('../controllers/v1/usersController');
 const { authUser } = require('../middlewares/authJwt');
 const { authUserById, validateUser, validateUsersPag } = require('../middlewares/authUser');
 const express = require('express');
-const app = express(); 
+const app = express();
+
 
 app.get('/api/v1/users', [authUser, validateUsersPag], UsersController.index);
 app.get('/api/v1/users/:id', [authUser, validateUser], UsersController.show);
