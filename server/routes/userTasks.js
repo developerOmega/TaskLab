@@ -4,6 +4,9 @@ const { authUserTaskAdmin, authUserTaskAdminById, validateUserTask } = require('
 const express = require('express');
 const app = express();
 
+// Rutas de user_tasks: Version 1
+// Peticiones -> post: insertar, delete: eliminar
+
 app.post('/api/v1/user-tasks', [authUser, authUserTaskAdmin], UserTasksController.post );
 app.delete('/api/v1/user-tasks/:user_id/:task_id', [authUser, validateUserTask, authUserTaskAdminById], UserTasksController.destroy );
 

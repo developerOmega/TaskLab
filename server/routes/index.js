@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 
+// Ejecutar todas las rutas
+
 app.use(require('./users.js'));
 app.use(require('./projects.js'));
 app.use(require('./messages.js'));

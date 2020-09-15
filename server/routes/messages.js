@@ -4,6 +4,9 @@ const { authMessage, authMessageById, validateMessage } = require('../middleware
 const express = require('express');
 const app = express();
 
+// Rutas de mensajes: Version 1
+// Peticiones -> post: insertar, put: actualizar, delete: eliminar
+
 // app.get('/api/v1/messages', MessagesController.index );
 // app.get('/api/v1/messages/:id', MessagesController.show );
 app.post('/api/v1/messages', [authUser, authMessage], MessagesController.post );

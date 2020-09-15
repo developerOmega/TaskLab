@@ -4,6 +4,9 @@ const { authEventAdmin, authEventAdminById, authEventById, validateEvent } = req
 const express = require('express');
 const app = express();
 
+// Rutas de eventos: Version 1
+// Peticiones -> get: mostrar por id, post: insertar, put: actualizar, delete: eliminar
+
 // app.get('/api/v1/events', EventsController.index );
 app.get('/api/v1/events/:id', [authUser, validateEvent, authEventById], EventsController.show );
 app.post('/api/v1/events', [authUser, authEventAdmin], EventsController.post );
