@@ -1,7 +1,11 @@
 const Model = require('./Model');
 const { db } = require('../../db/db');
 
+// Clase que administra los queries de la tabla 'users'
+
 class User extends Model {
+
+  // Constructor que inicializa las propiedades: name, email, password, img, verify, active
   constructor(user) {
     super(user);
     this.name = user.name;
@@ -12,11 +16,13 @@ class User extends Model {
     this.active = user.active;
   }
 
+  // Metodo que retorna todos los usuarios
   static async all() {
     let data = await db.query(`SELECT * FROM users`);
     return data;
   }
 
+  // Metodo que retorna los usuarios paginados
   static async paginate(init = 0, end = 0) {
     let data = init != 0 && end != 0 ? 
       await db.query(`SELECT * FROM users WHERE id >= ? AND id <= ?`, [init, end]) :
@@ -24,6 +30,7 @@ class User extends Model {
     return data;
   }
 
+  // Metodo que retorna los usuarios por id
   static async byId(id) {
     try {
       let data = await db.query(`SELECT * FROM users WHERE id=?`, [id]);
@@ -38,6 +45,7 @@ class User extends Model {
     }
   }
 
+  // Metodo que retorna los usuarios por email
   static async byEmail(email) {
     try{
       let user = await db.query(`SELECT * FROM users WHERE email=?`, [email]);
@@ -51,6 +59,8 @@ class User extends Model {
     }
   }
 
+  // Metodo que inserta un nuevo usuario en la tabla, retorna nuevo registro
+  // Recibe parametro -> body:object{name, email, body, password, verify}
   static async create(body) {
     let query = await db.query(
       `INSERT INTO users (name, email, password, verify) VALUES (?,?,?,?) RETURNING *`,
@@ -59,16 +69,20 @@ class User extends Model {
     return query[0];
   }
 
+  // Metodo que actualiza un usuario de la tabla, retorna registro actualizado
+  // Recibe parametro -> body:object ( nuevos datos para edicion )
   async update(body) {
     let query = await db.queryPatch( `UPDATE users SET data? WHERE id=? RETURNING *`, [body, this.id] );
     return query[0];
-  } 
+  }
 
+  // Metodo que elimina un usuario de la tabla, retorna informacion de la consulta
   async delete() {
     let data = await db.query(`DELETE FROM users WHERE id = ?`, [this.id]);
     return data;
   }
 
+  // Metodo que retorna proyectos del usaurios
   async projects() {
     let data = await db.query(
       `SELECT projects.id, projects.name, projects.description, projects.status, projects.user_id, projects.updated_at, projects.created_at
@@ -80,6 +94,8 @@ class User extends Model {
     return data;
   }
 
+  // Metodo hace la convercion de la url publica de Dropbox a url de imagen, retorna nueva url
+  // Recibe parametro -> url:string (url Dropbox)
   static imageUrl(url) {
   
     if(url.match(/www.dropbox.com/)){

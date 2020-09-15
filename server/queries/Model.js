@@ -1,5 +1,8 @@
+// Clase padre de Model
+
 class Model {
 
+  // Constructor inicializa peopiedades: id, update_at, created_at (Estas propiedades existe en todas las tablas)
   constructor (model) {
     this.id = model.id;
 
