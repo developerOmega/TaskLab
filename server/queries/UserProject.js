@@ -1,13 +1,19 @@
 const { db } = require('../../db/db');
 const Model = require('./Model');
 
+// Clase que administra los queries de la tabla 'user_projects'
+
 class UserProject extends Model{
+
+  // Constructos que iniciliza las propiedades: user_id, project_id y admin
   constructor(userProject) {
     this.user_id = userProject.user_id;
     this.project_id = userProject.project_id;
     this.admin = userProject.admin;
   }
 
+  // Metodo que inserta una nueva relacion user_projects en la tabla, retorna el nuevo regostro
+  // Recibe parametro -> body:object{user_id, project_idm admin}
   static async create (body) {
 
     let query = await db.query(
@@ -17,6 +23,8 @@ class UserProject extends Model{
     return query[0];
   }
 
+  // Metodod que retorna la relacion user_peojects por id
+  // Recibe parametros: user_id:number (id de ususario), project_id:number (id de projecto)
   static async byId (user_id, project_id) {
     try {
       let data = await db.query(
@@ -36,6 +44,8 @@ class UserProject extends Model{
     }
   }
 
+  // Metodo que retorna retorna la relacion user_projects por id y admin=true
+  // Recibe parametros: user_id:number (id de ususario), project_id:number (id de projecto)
   static async byIdAdmin (user_id, project_id) {
     try {
       let data = await db.query(
@@ -55,6 +65,8 @@ class UserProject extends Model{
     }
   }
 
+  // Metodo que elimina relacion user_projects de tabla, retorna informacion de consulta
+  // Recibe parametros: user_id:number (id de ususario), project_id:number (id de projecto) 
   static async deleteById(user_id, project_id) {
     try {
       let data = await db.query(
