@@ -1,6 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { JwtEnv } = require('../../config/config');
 
+// Middlewares que validan informacion del login del usuario
+
+// Middleware que autentica el Token JWT del usuario
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authUser = ( req, res, next ) => {
   let token = req.get('Authorization');
   
@@ -20,6 +24,8 @@ const authUser = ( req, res, next ) => {
   
 }
 
+// Middleware que desautoriza la entrada a rutas
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const unauthUser = ( req, res, next ) => {
   return res.status(401).json({
     ok: false,

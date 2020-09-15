@@ -2,6 +2,10 @@ const UserTask = require('../queries/UserTask');
 const Task = require('../queries/Task');
 const UserProject = require('../queries/UserProject');
 
+// Middlewares que validan informacion de routas '/tasks'
+
+// Middleware que autentica la relacion del usuario con el proyecto del task
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authTaskById = async (req, res, next) => {
   let taskId = req.params.id;
   
@@ -32,6 +36,8 @@ const authTaskById = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la relacion del usuario administrador con el input 'project_id' del boby del task
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authTaksAdmin = async (req, res, next) => {
   let body = req.body;
 
@@ -60,6 +66,8 @@ const authTaksAdmin = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la administracion del usuario con el proyecto del task
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authTaksAdminById = async (req, res, next) => {
   let taskId = req.params.id;
 
@@ -91,6 +99,8 @@ const authTaksAdminById = async (req, res, next) => {
 
 }
 
+// Middleware que valida relacion entre ususario y task
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateUsersByTask = async (req, res, next) => {
   let id = req.params.id;
 
@@ -117,6 +127,8 @@ const validateUsersByTask = async (req, res, next) => {
   }
 }
 
+// Middleware que verifica la existencia del task
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateTask = async (req, res, next) => {
   let id = req.params.id;
 

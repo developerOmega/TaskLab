@@ -1,6 +1,10 @@
 const UserProject = require('../queries/UserProject');
 const Message = require('../queries/Message');
 
+// Middlewares que validan informacion de routas '/messages'
+
+// Middleware que autentica la relacion del usuario con el input 'project_id' del boby del message
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authMessage = async (req, res, next) => {
   let body = req.body;
 
@@ -31,6 +35,8 @@ const authMessage = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la relacion del usuario con el proyecto del mensaje
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authMessageById = async (req, res, next) => {
   let id = req.params.id;
 
@@ -62,6 +68,8 @@ const authMessageById = async (req, res, next) => {
 
 }
 
+// Middleware que verifica la existencia del mensaje
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateMessage = async (req, res, next) => {
   let id = req.params.id;
 

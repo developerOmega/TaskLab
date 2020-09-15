@@ -1,5 +1,10 @@
 const UserProject = require('../queries/UserProject');
 
+// Middlewares que validan informacion de routas '/user-projects'
+
+
+// Middleware que autentica la administracion y relacion del usuario con el input 'project_id' del boby de user-projects
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authUserProjectAdmin = async (req, res, next) => {
   let body = req.body;
 
@@ -28,6 +33,8 @@ const authUserProjectAdmin = async (req, res, next) => {
   }
 }
 
+// Middleware que autentica la administracion y relacion del usuario con el project_id(placeholder) de la ruta
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authUserProjectById = async (req, res, next) => {
   let userId = parseInt(req.params.user_id);
   let projectId = parseInt(req.params.project_id);
@@ -57,6 +64,8 @@ const authUserProjectById = async (req, res, next) => {
   }
 }
 
+// Middleware que valida la existencia de la relacion entre usuarios y proyectos
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateUserProject = async (req, res, next) => {
   let userId = req.params.user_id;
   let projectId = req.params.project_id;

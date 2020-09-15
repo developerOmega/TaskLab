@@ -1,6 +1,10 @@
 const UserProject = require('../queries/UserProject');
 const Event = require('../queries/Event');
 
+// Middlewares que validan informacion de routas '/events'
+
+// Middleware que autentica la relacion del usuario con el proyecto del evento
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authEventById = async (req, res, next) => {
   let eventId = req.params.id;
 
@@ -29,6 +33,8 @@ const authEventById = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la relacion del usuario administrador con el input 'project_id' del boby del evento
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authEventAdmin = async (req, res, next) => {
   let body = req.body;
 
@@ -57,6 +63,8 @@ const authEventAdmin = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la administracion del usuario con el proyecto del evento
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authEventAdminById = async (req, res, next) => {
   let eventId = req.params.id;
 
@@ -88,6 +96,8 @@ const authEventAdminById = async (req, res, next) => {
 
 }
 
+// Middleware que verifica la existencia del evento
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const validateEvent = async (req, res, next) => {
   let id = req.params.id;
 

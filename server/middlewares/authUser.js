@@ -1,5 +1,9 @@
 const User = require('../queries/User');
 
+// Middlewares que validan informacion de routas '/users'
+
+// Middleware que autentica usuario con el id(placeholder) del usuario de la ruta
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const authUserById = async (req, res, next) => {
   let userId = parseInt(req.params.id);
 
@@ -16,6 +20,8 @@ const authUserById = async (req, res, next) => {
   next();
 }
 
+// Middleware que valida le existencia del usuario
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateUser = async (req, res, next) => {
   let id = req.params.id;
 
@@ -44,6 +50,8 @@ const validateUser = async (req, res, next) => {
   }
 }
 
+// Middleware que valida la existencia de usuarios en una paginacion
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateUsersPag = async (req, res, next) => {
   let init = req.query.init;
   let end = req.query.end;

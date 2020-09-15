@@ -1,3 +1,6 @@
+
+// Middleware que valida la extencion del archivo como una imagen
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateFiles = (req, res, next) => {
     if(!req.files){
         return res.status(400).json({

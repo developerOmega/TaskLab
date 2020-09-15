@@ -1,6 +1,10 @@
 const Project = require('../queries/Project');
 const UserProject = require('../queries/UserProject');
 
+// Middlewares que validan informacion de routas '/projects'
+
+// Middleware que autentica la relacion del usuario y el proyecto
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authProject = async (req, res, next) => {
   let projectId = req.params.id;
   
@@ -31,6 +35,8 @@ const authProject = async (req, res, next) => {
 
 }
 
+// Middleware que autentica la administracion del usuario en le proyecto
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const authProjectAdmin = async (req, res, next) => {
   let projectId = req.params.id;
   
@@ -61,6 +67,8 @@ const authProjectAdmin = async (req, res, next) => {
     
 }
 
+// Middleware que verifica la existencia del proyecto
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware)
 const validateProject = async (req, res, next) => {
   let id = req.params.id;
 
@@ -90,6 +98,8 @@ const validateProject = async (req, res, next) => {
   }
 }
 
+// Middleware que valida la existencia de registros en la paginacion del proyecto
+// Recibe parametros -> req:reqObject (request), res:resObject (response), next:any (llamar funcion para salir de middleware) 
 const validateProjectsPag = async (req, res, next) => {
   let init = req.query.init;
   let end = req.query.end;
