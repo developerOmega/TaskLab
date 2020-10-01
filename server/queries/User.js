@@ -24,6 +24,11 @@ class User extends Model {
     return data;
   }
 
+  static async search (email) {
+    let data = await db.query(`SELECT * FROM users WHERE email LIKE ? LIMIT ?`, [email + '%', 5]);
+    return data;
+  }
+
   static async byId(id) {
     try {
       let data = await db.query(`SELECT * FROM users WHERE id=?`, [id]);
