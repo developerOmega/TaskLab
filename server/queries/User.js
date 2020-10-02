@@ -30,6 +30,12 @@ class User extends Model {
     return data;
   }
 
+  // Metodo que retorna la busqueda de usuarios por email
+  static async search (email) {
+    let data = await db.query(`SELECT * FROM users WHERE email LIKE ? LIMIT ?`, [email + '%', 5]);
+    return data;
+  }
+
   // Metodo que retorna los usuarios por id
   static async byId(id) {
     try {

@@ -6,6 +6,27 @@ const bcrypt = require('bcrypt');
 
 class UsersController {
 
+  // Metodo que retorna json con la busqueda de usuarios por email
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
+  static async search (req, res) {
+    let search = req.params.search;
+    console.log(search);
+    
+    try {
+      let data = await User.search(search);
+      return res.status(200).json({
+        ok: true,
+        data
+      })
+      
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      })
+    }
+  }
+
   // Metodo que retorna json con la paginacion de todos los usuarios 
   // Recibe parametros -> req:reqObject (request), res:resObject (response)  
   static async index (req, res) {
@@ -110,6 +131,38 @@ class UsersController {
 
   }
 
+  // Metodo que actualiza el password de un usuario
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)
+  static async updatePassword (req, res) {
+    let body = req.body;
+    let id = req.params.id;
+    let user = await User.byId(id);
+
+    if ( !bcrypt.compareSync(body.old_password, user.password) ) {
+      return res.status(401).json({
+        ok: false,
+        err: {
+          message: "Password incorrecto"
+        }
+      })
+    }
+
+    try {
+      let data = await user.update({ password: bcrypt.hashSync(body.new_password, 10) });
+      
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      })
+    }
+  }
+
   // Metodo que elimina registro por id de tabla 'users', retorna json con mensaje
   // Recibe parametros -> req:reqObject (request), res:resObject (response)
   static async destroy(req, res) {
@@ -131,6 +184,28 @@ class UsersController {
         err
       });
 
+    }
+  }
+
+  // Metodo que desactova la cuenta del usuario
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
+  static async inactive ( req, res ) {
+    let id = req.params.id;
+
+    try{
+      let user = await User.byId(id);
+      let data = await user.update( { active: false } );
+
+      return res.status(200).json({
+        ok: true,
+        data,
+        message: "El usuario se ha eliminado con exito"
+      });
+    } catch (err) {
+      return res.status(400).json({
+        ok: false,
+        err
+      });
     }
   }
 
