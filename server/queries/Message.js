@@ -29,6 +29,25 @@ class Message extends Model {
     }
   }
 
+  static async byIdWithUser(id) {
+    try {
+      let data = await db.query(
+        `SELECT messages.id, messages.content, users.name, users.email, users.img, messages.updated_at, messages.created_at 
+        FROM messages INNER JOIN users ON messages.user_id=users.id
+        WHERE messages.id = ?`, [id]
+      );
+
+      if(!data[0]){
+        return false;
+      }
+
+      return data[0];
+
+    } catch (err) {
+      return err;
+    }
+  }
+
   static async create(body) {
     let query = await db.query(
       `INSERT INTO messages (content, user_id, project_id) VALUES (?,?,?) RETURNING *`, 
