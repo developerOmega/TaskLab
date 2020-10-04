@@ -98,7 +98,7 @@ class Project extends Model{
   // Metodo que retorna los mensajes del proyecto
   async messages () {
     let data = await db.query(
-      `SELECT messages.id, messages.content, users.name, users.email, messages.updated_at, messages.created_at 
+      `SELECT messages.id, messages.content, users.name, users.email, users.img, messages.updated_at, messages.created_at 
       FROM messages INNER JOIN users ON messages.user_id=users.id
       INNER JOIN projects ON messages.project_id=projects.id
       WHERE projects.id = ?`, [this.id]

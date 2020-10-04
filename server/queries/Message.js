@@ -35,6 +35,27 @@ class Message extends Model {
     }
   }
 
+  // Metodo que retorna mensajes junto con el usuario
+  // Recebe aprametros -> id:number (id del message)
+  static async byIdWithUser(id) {
+    try {
+      let data = await db.query(
+        `SELECT messages.id, messages.content, users.name, users.email, users.img, messages.updated_at, messages.created_at 
+        FROM messages INNER JOIN users ON messages.user_id=users.id
+        WHERE messages.id = ?`, [id]
+      );
+
+      if(!data[0]){
+        return false;
+      }
+
+      return data[0];
+
+    } catch (err) {
+      return err;
+    }
+  }
+
   // Metodo que inserta un nuevo mensaje en la tabla, retorna el nuevo registro
   // Recibe parametro -> body:object{content, user_id, project_id}
   static async create(body) {
