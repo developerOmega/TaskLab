@@ -118,7 +118,6 @@ class Project extends Model{
     let data = await db.query( `SELECT * FROM tasks WHERE project_id=? ORDER BY time_end DESC, updated_at DESC`, [this.id] );
     return data;
   }
-
 }
 
 module.exports = Project;
