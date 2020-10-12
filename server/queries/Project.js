@@ -109,13 +109,13 @@ class Project extends Model{
 
   // Metodo que retorna los eventos del proyecto
   async events () {
-    let data = await db.query( `SELECT * FROM events WHERE project_id=?`, [this.id] );
+    let data = await db.query( `SELECT * FROM events WHERE project_id=? ORDER BY time_end DESC`, [this.id] );
     return data;
   }
 
   // Metodo que retorna las tareas del proyecto
   async tasks () {
-    let data = await db.query( `SELECT * FROM tasks WHERE project_id=?`, [this.id] );
+    let data = await db.query( `SELECT * FROM tasks WHERE project_id=? ORDER BY time_end DESC, updated_at DESC`, [this.id] );
     return data;
   }
 

@@ -94,7 +94,7 @@ class User extends Model {
       `SELECT projects.id, projects.name, projects.description, projects.status, projects.user_id, projects.updated_at, projects.created_at
       FROM projects INNER JOIN user_projects ON projects.id=user_projects.project_id
       INNER JOIN users ON user_projects.user_id=users.id 
-      WHERE users.id=?;`,
+      WHERE users.id=? ORDER BY projects.updated_at DESC;`,
       [this.id]
     );
     return data;

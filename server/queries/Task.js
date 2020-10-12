@@ -24,7 +24,7 @@ class Task extends Model {
   // Metodo que retorna las tareas paginadas
   static async paginate (init = 0, end = 0) {
     let data = init != 0 && end != 0 ? 
-      await db.query(`SELECT * FROM tasks WHERE id >= ? AND id <= ?`, [inti, end]) :
+      await db.query(`SELECT * FROM tasks WHERE id >= ? AND id <= ? ORDER BY id ASC`, [inti, end]) :
       await db.query(`SELECT * FROM tasks`);
     return data;
   }
