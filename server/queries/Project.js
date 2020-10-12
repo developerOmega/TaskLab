@@ -93,13 +93,13 @@ class Project extends Model{
   }
 
   async events () {
-    let data = await db.query( `SELECT * FROM events WHERE project_id=?`, [this.id] );
+    let data = await db.query( `SELECT * FROM events WHERE project_id=? ORDER BY time_end DESC`, [this.id] );
     return data;
   }
 
 
   async tasks () {
-    let data = await db.query( `SELECT * FROM tasks WHERE project_id=?`, [this.id] );
+    let data = await db.query( `SELECT * FROM tasks WHERE project_id=? ORDER BY time_end DESC, updated_at DESC`, [this.id] );
     return data;
   }
 
