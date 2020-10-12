@@ -115,7 +115,15 @@ class Project extends Model{
 
   // Metodo que retorna las tareas del proyecto
   async tasks () {
-    let data = await db.query( `SELECT * FROM tasks WHERE project_id=? ORDER BY time_end DESC, updated_at DESC`, [this.id] );
+    let data = await db.query( `
+      SELECT * FROM tasks WHERE project_id=? ORDER BY time_end DESC, (CASE status 
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine' THEN 3
+        WHEN 'error' THEN 4
+        END
+      )
+    `, [this.id] );
     return data;
   }
 }
