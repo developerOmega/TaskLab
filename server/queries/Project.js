@@ -111,6 +111,35 @@ class Project extends Model{
     return data;
   }
 
+  async taskMoreThanTimeEnd ( time_end ) {
+    let data = await db.query(`
+      SELECT * FROM tasks WHERE project_id=? AND (time_end::date >= ?::date)
+      ORDER BY time_end DESC, (CASE status 
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine' THEN 3
+        WHEN 'error' THEN 4
+        END
+      )
+    `, [this.id, time_end]);
+
+    return data;
+  }
+  async taskMTAndStatusTimeEnd ( time_end ) {
+    let data = await db.query(`
+      SELECT * FROM tasks WHERE project_id=? AND (time_end::date >= ?::date OR status != 'fine') 
+      ORDER BY time_end DESC, (CASE status 
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine' THEN 3
+        WHEN 'error' THEN 4
+        END
+      )
+    `, [this.id, time_end]);
+
+    return data;
+  }
+
 }
 
 module.exports = Project;
