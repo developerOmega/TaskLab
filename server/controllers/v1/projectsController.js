@@ -1,4 +1,5 @@
 const Project = require("../../queries/Project");
+const Task = require('../../queries/Task');
 const UserProject = require('../../queries/UserProject');
 
 // Clase que almacena los controladores de ruta '/api/v1/projects'
@@ -315,6 +316,15 @@ class ProjectsController {
     try {
       let project = await Project.byId(id);
       let data = await project.taskMTAndStatusTimeEnd(query.time_end);
+
+      // Funcion que filtra el time_end de task que sea menor a la fecha actual y la el status igual a none 
+      const taskWarning = data.filter( task => task.time_end <= new Date() && task.status === 'none' );
+
+      // Ciclo para editar status de task (de none a warning)
+      taskWarning.forEach( async task => {
+        const reqTask = await Task.byId(task.id);
+        await reqTask.update( { status: 'warning' } );
+      });
 
       if(data.length < 1) {
         return res.status(400).json({
