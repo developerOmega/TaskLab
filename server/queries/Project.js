@@ -126,6 +126,41 @@ class Project extends Model{
     `, [this.id] );
     return data;
   }
+
+  // Metodo que retorna las tareas del proyecto que seam mayor al parametro time_end
+  // Recibe parametros -> time_end:datetime
+  async taskMoreThanTimeEnd ( time_end ) {
+    let data = await db.query(`
+      SELECT * FROM tasks WHERE project_id=? AND (time_end::date >= ?::date)
+      ORDER BY time_end DESC, (CASE status 
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine' THEN 3
+        WHEN 'error' THEN 4
+        END
+      )
+    `, [this.id, time_end]);
+
+    return data;
+  }
+
+  // Metodo que retorna las tareas del proyecto que seam mayor al parametro time_end o que su status no sea igual a 'fine'
+  // Recibe parametros -> time_end:datetime
+  async taskMTAndStatusTimeEnd ( time_end ) {
+    let data = await db.query(`
+      SELECT * FROM tasks WHERE project_id=? AND (time_end::date >= ?::date OR status != 'fine') 
+      ORDER BY time_end DESC, (CASE status 
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine' THEN 3
+        WHEN 'error' THEN 4
+        END
+      )
+    `, [this.id, time_end]);
+
+    return data;
+  }
+
 }
 
 module.exports = Project;

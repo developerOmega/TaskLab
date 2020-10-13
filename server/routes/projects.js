@@ -20,5 +20,6 @@ app.get('/api/v1/projects/:id/users', [authUser], ProjectsController.indexUsers)
 app.get('/api/v1/projects/:id/messages', [authUser, authProject], ProjectsController.indexMessages);
 app.get('/api/v1/projects/:id/events', [authUser, authProject], ProjectsController.indexEvents);
 app.get('/api/v1/projects/:id/tasks', [authUser, authProject], ProjectsController.indexTasks);
+app.get('/api/v1/projects/:id/task-time-end', [authUser, authProject], ProjectsController.indexTaskWithTimeEnd);
 
 module.exports = app;

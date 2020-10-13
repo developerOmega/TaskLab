@@ -275,6 +275,11 @@ class ProjectsController {
   static async indexTasks(req, res) {
     let id = req.params.id;
 
+    if(req.query.time_end){
+      await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+      return;
+    }
+ 
     try {
       let project = await Project.byId(id);
       let data = await project.tasks();
@@ -300,6 +305,71 @@ class ProjectsController {
       });
     }
   }
+  
+  // Metodo que retorna json con las tareas mayores al parametro time_end pertenecientes a un peoyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
+  static async indexTaskWithTimeEndAndStatus ( req, res ) {
+    let id = req.params.id;
+    let query = req.query;
+
+    try {
+      let project = await Project.byId(id);
+      let data = await project.taskMTAndStatusTimeEnd(query.time_end);
+
+      if(data.length < 1) {
+        return res.status(400).json({
+          ok: false,
+          err: {
+            message: 'No hay tareas'
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
+  }
+
+  // Metodo que retorna json con las tareas mayores al parametro time_end o con status no igual a 'fine' pertenecientes a un peoyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response)  
+  static async indexTaskWithTimeEnd ( req, res ) {
+    let id = req.params.id;
+    let query = req.query;
+
+    try {
+      let project = await Project.byId(id);
+      let data = await project.taskMoreThanTimeEnd(query.time_end);
+
+      if(data.length < 1) {
+        return res.status(400).json({
+          ok: false,
+          err: {
+            message: 'No hay tareas'
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
+  }
+
 }
 
 module.exports = { ProjectsController };
