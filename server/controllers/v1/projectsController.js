@@ -1,4 +1,5 @@
 const Project = require("../../queries/Project");
+const Task = require('../../queries/Task');
 const UserProject = require('../../queries/UserProject');
 
 class ProjectsController {
@@ -283,33 +284,39 @@ class ProjectsController {
   }
   
   static async indexTaskWithTimeEndAndStatus ( req, res ) {
-                      let id = req.params.id;
-                      let query = req.query;
-                  
-                      try {
-                        let project = await Project.byId(id);
-                        let data = await project.taskMTAndStatusTimeEnd(query.time_end);
-                  
-                        if(data.length < 1) {
-                          return res.status(400).json({
-                            ok: false,
-                            err: {
-                              message: 'No hay tareas'
-                            }
-                          });
-                        }
-                  
-                        return res.status(200).json({
-                          ok: true,
-                          data
-                        });
-                  
-                      } catch (err) {
-                        return res.status(500).json({
-                          ok: false,
-                          err
-                        });
-                      }
+    let id = req.params.id;
+    let query = req.query;
+
+    try {
+      let project = await Project.byId(id);
+      let data = await project.taskMTAndStatusTimeEnd(query.time_end);
+      const taskWarning = data.filter( task => task.time_end <= new Date() && task.status === 'none' );
+
+      taskWarning.forEach( async task => {
+        const reqTask = await Task.byId(task.id);
+        await reqTask.update( { status: 'warning' } );
+      });
+
+      if(data.length < 1) {
+        return res.status(400).json({
+          ok: false,
+          err: {
+            message: 'No hay tareas'
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        ok: false,
+        err
+      });
+    }
   }
 
   static async indexTaskWithTimeEnd ( req, res ) {
