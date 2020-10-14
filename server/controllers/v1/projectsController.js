@@ -316,12 +316,19 @@ class ProjectsController {
     try {
       let project = await Project.byId(id);
       let data = await project.taskMTAndStatusTimeEnd(query.time_end);
+      let date = new Date();
+
+      // Igualar hora a 0
+      date.setHours(0);
+      date.setMinutes(0);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
 
       // Funcion que filtra el time_end de task que sea menor a la fecha actual y la el status igual a none 
-      const taskWarning = data.filter( task => task.time_end <= new Date() && task.status === 'none' );
-
+      const taskWarning = data.filter( task => task.time_end < date && task.status === 'none' );
+      
       // Ciclo para editar status de task (de none a warning)
-      taskWarning.forEach( async task => {
+      taskWarning.forEach( async task => {     
         const reqTask = await Task.byId(task.id);
         await reqTask.update( { status: 'warning' } );
       });
