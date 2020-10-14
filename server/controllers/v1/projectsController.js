@@ -290,9 +290,16 @@ class ProjectsController {
     try {
       let project = await Project.byId(id);
       let data = await project.taskMTAndStatusTimeEnd(query.time_end);
-      const taskWarning = data.filter( task => task.time_end <= new Date() && task.status === 'none' );
+      let date = new Date();
 
-      taskWarning.forEach( async task => {
+      date.setHours(0);
+      date.setMinutes(0);
+      date.setSeconds(0);
+      date.setMilliseconds(0);
+
+      const taskWarning = data.filter( task => task.time_end < date && task.status === 'none' );
+
+      taskWarning.forEach( async task => {     
         const reqTask = await Task.byId(task.id);
         await reqTask.update( { status: 'warning' } );
       });
