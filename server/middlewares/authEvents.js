@@ -71,7 +71,7 @@ const authEventAdminById = async (req, res, next) => {
   try {
 
     let event = await Event.byId(eventId);
-    let userProject = await UserProject.byId(req.user.id, event.project_id);
+    let userProject = await UserProject.byIdAdmin(req.user.id, event.project_id);
   
     if(!userProject) {
       return res.status(403).json({
