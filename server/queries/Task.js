@@ -56,11 +56,12 @@ class Task extends Model {
 
   async users() {
     let data = await db.query(
-      `SELECT users.id, users.name, users.img, users.email, users.verify, users.active, users.updated_at, users.created_at
+      `SELECT users.id, users.name, users.img, users.email, users.verify, users.active, user_projects.admin, users.updated_at, users.created_at
       FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id
       INNER JOIN users ON user_tasks.user_id=users.id
-      WHERE tasks.id=?;`,
-      [this.id]
+      INNER JOIN user_projects ON users.id=user_projects.user_id
+      WHERE tasks.id=? AND user_projects.project_id=?;`,
+      [this.id, this.project_id]
     );
     return data;
   }
