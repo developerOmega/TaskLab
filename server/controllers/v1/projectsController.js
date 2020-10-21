@@ -276,8 +276,27 @@ class ProjectsController {
   static async indexTasks(req, res) {
     let id = req.params.id;
 
+    // Condicional, si existe el query time_end entonces ejecutar los controladores por time_end
     if(req.query.time_end){
-      await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+
+      // Estructura switch, controlara el parametro query de status
+      switch(req.query.status) {
+
+        // Si parametro es 'equal' entonces ejecutara el controlador de tareas por time_end
+        case 'equal':
+          await ProjectsController.indexTaskByTimeEnd(req, res);  
+          break
+  
+        // Si parametro es 'major' entonces ejecutara el controlador de tareas mayores a time_end
+        case 'major':
+          await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+          break;
+        
+        // Si parametro es default entonces ejecutara el controlador de tareas mayores a time_end
+        default:
+          await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+          break;
+      }
       return;
     }
  
@@ -304,6 +323,38 @@ class ProjectsController {
         ok: false,
         err
       });
+    }
+  }
+
+  // Metodo que retorna json con las tareas iguales al parametro time_end pertenecientes a un peoyecto
+  // Recibe parametros -> req:reqObject (request), res:resObject (response) 
+  static async indexTaskByTimeEnd (req, res) {
+    let id = req.params.id;
+    let query = req.query;
+
+    try {
+      let project = await Project.byId(id);
+      let data = await project.tasByTimeEnd( query.time_end );
+
+      if(data.length < 1) {
+        return res.status(404).json({
+          ok: false,
+          err: {
+            message: "No se encontro la tarea"
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        ok: false,
+        error
+      })
     }
   }
   
