@@ -303,24 +303,15 @@ class ProjectsController {
       let project = await Project.byId(id);
       let data = await project.tasByTimeEnd( query.time_end );
 
-      if(data.length < 1) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encontro la tarea"
-          }
-        });
-      }
-
       return res.status(200).json({
         ok: true,
         data
       });
 
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({
         ok: false,
-        error
+        err
       })
     }
   }
