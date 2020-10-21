@@ -253,7 +253,19 @@ class ProjectsController {
     let id = req.params.id;
 
     if(req.query.time_end){
-      await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+      switch(req.query.status) {
+        case 'equal':
+          await ProjectsController.indexTaskByTimeEnd(req, res);  
+          break
+  
+        case 'major':
+          await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+          break;
+        
+        default:
+          await ProjectsController.indexTaskWithTimeEndAndStatus(req, res);
+          break;
+      }
       return;
     }
  
@@ -280,6 +292,36 @@ class ProjectsController {
         ok: false,
         err
       });
+    }
+  }
+
+  static async indexTaskByTimeEnd (req, res) {
+    let id = req.params.id;
+    let query = req.query;
+
+    try {
+      let project = await Project.byId(id);
+      let data = await project.tasByTimeEnd( query.time_end );
+
+      if(data.length < 1) {
+        return res.status(404).json({
+          ok: false,
+          err: {
+            message: "No se encontro la tarea"
+          }
+        });
+      }
+
+      return res.status(200).json({
+        ok: true,
+        data
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        ok: false,
+        error
+      })
     }
   }
   
