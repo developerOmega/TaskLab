@@ -145,7 +145,27 @@ class Project extends Model{
     return data;
   }
 
-  // Metodo que retorna las tareas del proyecto que seam mayor al parametro time_end
+  // Metodo que retorna las tareas del proyecto que sean igual los parametros time_end y userId
+  // Recibe parametros -> time_end:datetime, userId:integer
+  async taskByTimeEndAndUser( timeEnd, userId ) {
+    let data = await db.query(`
+      SELECT id, description, status, time_init, time_end, project_id, updated_at, created_at, user_id  
+      FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id 
+      WHERE project_id=?  AND (time_end::date = ?::date) AND user_id=?
+      ORDER BY time_end DESC, (CASE status
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine'  THEN 3
+        WHEN 'error' THEN 4
+        END
+        
+      )
+    `, [this.id, timeEnd, userId]);
+
+    return data;
+  }
+
+  // Metodo que retorna las tareas del proyecto que sean mayor al parametro time_end
   // Recibe parametros -> time_end:datetime
   async taskMoreThanTimeEnd ( time_end ) {
     let data = await db.query(`

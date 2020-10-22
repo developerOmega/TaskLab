@@ -284,7 +284,7 @@ class ProjectsController {
 
         // Si parametro es 'equal' entonces ejecutara el controlador de tareas por time_end
         case 'equal':
-          await ProjectsController.indexTaskByTimeEnd(req, res);  
+          await ProjectsController.indexTaskByTimeEndAndUser(req, res);  
           break
   
         // Si parametro es 'major' entonces ejecutara el controlador de tareas mayores a time_end
@@ -326,34 +326,35 @@ class ProjectsController {
     }
   }
 
-  // Metodo que retorna json con las tareas iguales al parametro time_end pertenecientes a un peoyecto
+  // Metodo que retorna json con las tareas iguales a los parametros time_end y user_id
   // Recibe parametros -> req:reqObject (request), res:resObject (response) 
-  static async indexTaskByTimeEnd (req, res) {
+  static async indexTaskByTimeEndAndUser (req, res) {
     let id = req.params.id;
     let query = req.query;
 
+    // Condicional que valida la inexistencia del parametro user_id
+    if(!query.user_id) {
+      return res.status(400).json({
+        ok: false,
+        err: {
+          message: "No se ingreso el id del usuario"
+        }
+      })
+    }
+
     try {
       let project = await Project.byId(id);
-      let data = await project.tasByTimeEnd( query.time_end );
-
-      if(data.length < 1) {
-        return res.status(404).json({
-          ok: false,
-          err: {
-            message: "No se encontro la tarea"
-          }
-        });
-      }
+      let data = await project.taskByTimeEndAndUser( query.time_end, parseInt(query.user_id) );
 
       return res.status(200).json({
         ok: true,
         data
       });
 
-    } catch (error) {
+    } catch (err) {
       return res.status(500).json({
         ok: false,
-        error
+        err
       })
     }
   }
