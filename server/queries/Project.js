@@ -126,6 +126,24 @@ class Project extends Model{
     return data;
   }
 
+  async taskByTimeEndAndUser( timeEnd, userId ) {
+    let data = await db.query(`
+      SELECT id, description, status, time_init, time_end, project_id, updated_at, created_at, user_id  
+      FROM tasks INNER JOIN user_tasks ON tasks.id=user_tasks.task_id 
+      WHERE project_id=?  AND (time_end::date = ?::date) AND user_id=?
+      ORDER BY time_end DESC, (CASE status
+        WHEN 'none' THEN 1
+        WHEN 'warning' THEN 2
+        WHEN 'fine'  THEN 3
+        WHEN 'error' THEN 4
+        END
+        
+      )
+    `, [this.id, timeEnd, userId]);
+
+    return data;
+  }
+
   async taskMoreThanTimeEnd ( time_end ) {
     let data = await db.query(`
       SELECT * FROM tasks WHERE project_id=? AND (time_end::date >= ?::date)
