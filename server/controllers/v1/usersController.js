@@ -1,5 +1,7 @@
 const User = require('../../queries/User');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { JwtEnv } = require('../../../config/config');
 
 class UsersController {
 
@@ -67,6 +69,15 @@ class UsersController {
   static async post(req, res) {
     let body = req.body;
 
+    if(body.repeat_password != body.password) {
+      return res.status(403).json({
+        ok: false,
+        err: {
+          message: "Las contraseñas no coincidien"
+        }
+      });
+    }
+
     try {
       
       let data = await User.create({
@@ -77,9 +88,13 @@ class UsersController {
         verify: body.verify
       });
 
+      let user = await User.byEmail(body.email);
+      let token = jwt.sign({ user }, JwtEnv.privateKey, JwtEnv.signOptions );
+
       res.status(200).json({
         ok: true,
-        data
+        data,
+        token
       });
 
     } catch (err) {
